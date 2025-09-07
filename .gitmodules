@@ -1,6 +1,3 @@
-[submodule "ecm/lisp/old-maxclaims/descriptions"]
-	path = ecm/lisp/old-maxclaims/descriptions
-	url = git@github.com:mmontone/descriptions.git
 [submodule "ecm/lisp/old-maxclaims/maxclaims"]
 	path = ecm/lisp/old-maxclaims/maxclaims
 	url = git@github.com:Aufin/ecm.git

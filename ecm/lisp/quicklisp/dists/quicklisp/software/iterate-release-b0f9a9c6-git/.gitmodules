@@ -1,3 +1,0 @@
-[submodule "ext/rt"]
-	path = ext/rt
-	url = https://gitlab.common-lisp.net/rtoy/rt.git
