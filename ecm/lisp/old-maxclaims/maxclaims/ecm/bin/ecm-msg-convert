@@ -1,0 +1,10 @@
+#!/bin/sh
+mkdir -p /tmp/msgconvert/  
+ECM_MSGCONVERT_MBOX=$(mktemp --suffix=.mbox --tmpdir=/tmp/msgconvert)
+
+for word in "$@"; do msgconvert --mbox $ECM_MSGCONVERT_MBOX "$word" ; done
+
+sed -i 's/FYDIBOHF23SPDLT/Marion Maxwell/g' $ECM_MSGCONVERT_MBOX
+
+cat $ECM_MSGCONVERT_MBOX ;
+rm $ECM_MSGCONVERT_MBOX;
