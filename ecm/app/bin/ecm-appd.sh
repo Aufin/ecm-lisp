@@ -121,9 +121,10 @@ ensure-caddy () {
 }
 
 caddy-show-log() {
-  DASHn=${$1:-25}
-  tail -n $DASHn $CADDY_SERVICE_LOG
+  eval cat $CADDY_START_LOG $@
+  eval cat $CADDY_SERVICE_LOG $@
 }
+
 
 clean () {
 	false
@@ -151,18 +152,34 @@ show-status () {
 
 }
 
+dispatch-logs () {
+	if [ "$#" -eq 0 ]; then
+		caddy-show-log | jq
+	else
+		case "$1" in
+		caddy)
+			shift;
+            caddy-show-log "$@";
+			;;
+		esac
+	fi
+}
+
 dispatch () {
 	echo DISPATCH $1 or $@;
 	case "$1" in
 		status)
 			show-status;
 			;;
-		log)
-			caddy-show-log;
+		log|logs)
+             shift; dispatch-logs $@
 			;;
 	
 		shell)
 			sh
+			;;
+ 		mux)
+			mux $@
 			;;
 		quit)
 			exec sh
@@ -178,6 +195,12 @@ dispatch () {
 	
 }
 
+mux () {
+  while read -p "ecm-appd> " inp; do
+	  dispatch $inp
+  done
+}
+
 start () {
 mkdir -p "${VARRUN}"
   ensure-httpd > /dev/null &2>1
@@ -188,13 +211,12 @@ mkdir -p "${VARRUN}"
   show-status
   echo;echo;echo "Enter a command or help for a list thereof"
 
+  rlwrap ecm-appd mux
 
-  while read -p "ecm-appd> " inp; do
-	  dispatch "$inp"
-  done
 }
 	
 if [ "$#" -eq 0 ]; then
-	start
-	
-  fi
+	  start
+else
+	dispatch $@
+fi

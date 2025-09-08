@@ -76,10 +76,11 @@ COPY --from=lisp /usr/local/bin/ecm-application /usr/local/bin
 COPY --from=lisp /usr/local/bin/detachtty /usr/local/bin
 COPY --from=lisp /usr/local/bin/attachtty /usr/local/bin
 
+RUN apk add nss-tools jq rlwrap
+
 COPY ecm /srv/ecm
 # RUN ls /srv
 
-RUN apk add nss-tools
 
 RUN mkdir -p /srv/ecm/var/log/ecm-lisp
 RUN mkdir -p /srv/ecm/var/log/ecm-appd

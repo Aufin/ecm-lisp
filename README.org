@@ -123,11 +123,12 @@ Gerbil comes first.
   COPY --from=lisp /usr/local/bin/ecm-application /usr/local/bin
   COPY --from=lisp /usr/local/bin/detachtty /usr/local/bin
   COPY --from=lisp /usr/local/bin/attachtty /usr/local/bin
+  
+  RUN apk add nss-tools jq rlwrap
 
   COPY ecm /srv/ecm
   # RUN ls /srv
 
-  RUN apk add nss-tools
 
   RUN mkdir -p /srv/ecm/var/log/ecm-lisp
   RUN mkdir -p /srv/ecm/var/log/ecm-appd
@@ -136,7 +137,7 @@ Gerbil comes first.
   RUN ln -s /srv/ecm/etc/ecm /root/.ecm
 
   RUN ls -l /root/.ecm
-  
+
   ## ** Rebuild the app
   ENV GERBIL_PATH="/srv/ecm/app/.gerbil"
   ENV PATH=/opt/gerbil/bin:"${PATH}"
