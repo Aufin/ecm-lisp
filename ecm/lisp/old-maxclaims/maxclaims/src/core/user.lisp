@@ -11,17 +11,28 @@
   (:documentation "Return list of CONTRACT objects a user is permitted
 to view, or NIL for all are permissible"))
 
+(defmethod user-contracts ((uid integer))
+  (let* ((all (caar (postmodern:query (:select 'read :from 'user.contract-permission :where (:and (:is-null 'contract-id) (:= 'user-id uid))))))
+		 (some (and (not all)
+					(query-objects
+					 'contract
+					 (lambda (n cs)
+					   `(:select ,@cs :from ,n
+						 :where
+						 (:= contract-id
+							 (:any (:select contract-id
+									:from user.contract-permission
+									:where (:and (:= user-id ,uid)
+												 read))))))))))
+	(cond
+	  ;; T means NIL due to old time logic
+	  (all nil)
+	  (some some)
+	  (t (error "User id ~A has no contract permissions" uid)))))
+
+
 (defmethod user-contracts ((user app-user))
-  ;; fixme: way too consy for the number of times this is called per
-  ;; page view
-  (let ((d (remove-duplicates (append (mapcar #'app-user-contract.contract
-					      (app-user.contracts user))
-				      (mappend (compose #'person.contracts-as-agency
-							#'app-user-agency.agency)
-					       (app-user.agency user)))
-			      :test #'db=)))
-    #+nil(break "contracts: ~A" d)
-    d))
+  (user-contracts (app-user.app-user-id user)))
 
 (defmethod user-can-delete-p (object)
   (app-user.admin $app-user))

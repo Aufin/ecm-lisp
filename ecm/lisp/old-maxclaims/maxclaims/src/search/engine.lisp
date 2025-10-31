@@ -35,31 +35,33 @@
 		             :key (lambda (c)
 		                    (getf c :claim-id)))))
     (unless (and access 
-		             (not (getf access :access)))
-      T))(defmethod remove-duplicates* (list record)
+		         (not (getf access :access)))
+      T)))
+
+(defmethod remove-duplicates* (list record)
     (remove-duplicates
      list :key #'object-id :from-end t))
- 
-
-  )
-
 
 (defun filter-claims (claims)
   (let* ((contract-ids (mapcar #'%contract-id
-			       (user-contracts $app-user)))
-	 )
+			       (user-contracts $app-user))))
 
     (if (null contract-ids)
 	claims
 	(remove-if-not (lambda (claim)
-			             (or (member (ignore-errors (%contract-id (risk.contract (claim.risk claim))))
-				                       contract-ids)
-			                 (claim-access-p claim)))
-		       claims))))
+			         (or (member
+						  (ignore-errors
+						   (%contract-id
+							(risk.contract (claim.risk claim))))
+				          contract-ids)
+			             (claim-access-p claim)))
+				   claims)))) 
 
 
-(defun string-search-claim (search-string &key (exact nil) 
-					                                  (limit '(:raw "ALL")))
+(defun string-search-claim (search-string
+							&key
+							  (exact nil) 
+					          (limit '(:raw "ALL")))
   (filter-claims
    (append
     (let ((res (ignore-errors (parse-integer search-string :junk-allowed nil))))
@@ -144,25 +146,7 @@
 
 
 (defun filter-people (people)
-  (let ((contract-ids (mapcar #'%contract-id
-			      (user-contracts $app-user))))
-    (if (null contract-ids)
-	people
-	(nconc  (remove-if-not (lambda (person)
-				 (intersection 
-				  (mapcar (lambda (r)
-					    (when (slot-boundp r 'contract-id)
-					      (slot-value r 'contract-id)))
-					  (agency-contracts person))
-				  contract-ids))
-			       people)
-		(remove-if-not (lambda (person)
-				 (intersection 
-				  (mapcar (lambda (risk)
-					    (%contract-id (risk.contract risk)))
-					  (mapcan #'find-risks (person.policies-as-insured person)))
-				  contract-ids))
-			       people)))))
+  people)
 
 (defun string-search-person (search-string &key (exact nil))
 ;; (break)
