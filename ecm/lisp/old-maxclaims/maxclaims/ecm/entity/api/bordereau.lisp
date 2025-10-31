@@ -102,7 +102,7 @@
 
 (defgeneric bordereau-file-directory (bdx)
     (:method (bdx)
-      #P"/tmp/ecm-bordereau-csv/"))
+      #P"/tablespaces/shared/ecm-bordereau-csv/"))
 
 (defgeneric bordereau-pathname (bdx)
   (:method (bdx)
