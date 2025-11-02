@@ -1,9 +1,0 @@
-#!/bin/sh
-ECM_SCRIPT=$(readlink -f "$0")
-ECM_SCRIPT_PATH=$(dirname "$ECM_SCRIPT")
-ECM_ETC="$ECM_SCRIPT_PATH/../etc/"
-
-# We check if it is s3 based, and if so mount it.
-/ecm/bin/s3fs-automount "$1"
-
-ls -d "$1" && encfs --extpass="cat $ECM_ETC/key/ecm-encfs.key" --standard --public $*
