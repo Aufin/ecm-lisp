@@ -1,0 +1,1 @@
+dists/quicklisp/software/lisp-namespace-20221106-git/lisp-namespace.test.asd

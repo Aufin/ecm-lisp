@@ -1,0 +1,1408 @@
+\input texinfo @c -*- Mode: texinfo; fill-column: 80 -*-
+@c %**start of header
+@setfilename sheeple.info
+@settitle Sheeple @value{VERSION} Manual
+@firstparagraphindent insert
+@c %**end of header
+
+@set EDITION 0.2
+@set VERSION v3.0.4
+@set UPDATED-MONTH January 2010
+@set UPDATED 06 @value{UPDATED-MONTH}
+@clear mop
+@syncodeindex fn vr
+
+@copying
+This is Edition @value{EDITION},
+last updated @value{UPDATED},
+of @cite{The Sheeple Manual},
+for Sheeple @value{VERSION}.
+
+Copyright @copyright{} 2009, 2010 Kat Marchán, Adlai Chandrasekhar
+
+This software is composed in part of code taken from SBCL's version of PCL, and
+Closette as presented in Art of the Metaobject Protocol, at times with only
+small modifications. It also contains some original code. Copying and
+distribution of this software must retain the copyright notice for Xerox, as
+well as Kat Marchán's:
+
+@quotation
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+@end quotation
+
+Xerox's copyright, from original PCL sources:
+
+@quotation
+Copyright @copyright{} 1985, 1986, 1987, 1988, 1989, 1990 Xerox Corporation. All
+rights reserved.
+
+Use and copying of this software and preparation of derivative works based upon
+this software are permitted. Any distribution of this software or derivative
+works must comply with all applicable United States export control laws.
+
+This software is made available AS IS, and Xerox Corporation makes no warranty
+about the software, its performance or its conformity to any specification.
+@end quotation
+
+Additionally, Sheeple uses Luis Oliveira's trivial-garbage for portability
+across implementations. trivial-garbage is in the public domain, thus although
+the statement packaged with it is included here, copies and derivatives of
+Sheeple need not include it:
+
+@quotation
+This software is placed in the public domain by Luis Oliveira
+<loliveira@@common-lisp.net> and is provided with absolutely no warranty.
+@end quotation
+@end copying
+
+@titlepage
+@title Sheeple Manual
+@subtitle Edition @value{EDITION}, covering Sheeple @value{VERSION}
+@subtitle @value{UPDATED-MONTH}
+@sp 2
+@image{logo}
+@author by Adlai Chandrasekhar and Kat Marchán
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+
+@node Top, Overview, (dir), (dir)
+@top Sheeple Manual
+@image{logo}
+
+This manual is for Sheeple @value{VERSION}
+@end ifnottex
+
+@menu
+* Overview::                    Non-Technical Overview of Sheeple
+* API Documentation::           Technical Overview of Sheeple
+* API Index::                   Index of the Sheeple API
+* Concept Index::               Index of General Concepts
+* Copying::                     Your rights and freedoms
+@end menu
+@node Overview, API Documentation, Top, Top
+@chapter Overview
+
+@menu
+* About Sheeple::               A Non-Technical Overview
+* Installing Sheeple::          A Slightly Technical Guide
+@end menu
+
+@node About Sheeple, Installing Sheeple, Overview, Overview
+@section About Sheeple
+@cindex general overview
+
+@menu
+* Vision::                      The Grand Plan for Sheeple
+* History::                     What Inspired Sheeple? What Influenced Sheeple?
+@end menu
+
+@node Vision, History, About Sheeple, About Sheeple
+@subsection Vision
+@cindex Vision
+Sheeple is a Dynamic, @acronym{CLOS}-like, Delegative Prototype-based Object-Oriented
+Programming Framework (or "POOP Framework") that strives to optimize application
+flexibility, minimize cost while increasing value, maximize programmer
+resources, and empower application implementers to better assist them in
+leveraging modern paradigms in order to proactively achieve next-generation
+synergy in tomorrow's web 3.0 world. It is implemented in (mostly) ANSI Common
+Lisp. Sheeple is fully buzzword compliant.
+
+@node History,  , Vision, About Sheeple
+@subsection History
+@cindex history of Sheeple
+Sheeple was originally written as a persistent library for use with
+Sykosomatic. Because of a desire to use it in other applications, it was
+rewritten as a regular prototype object system and provided as a standalone
+library meant for general-purpose OO hackery.
+
+Persistent Sheeple has not been abandoned, instead, it's being implemented as a
+separate library using Sheeple's reflection features.
+
+@cindex influences on Sheeple
+Sheeple is inspired by a number of Object-Oriented systems, mainly:
+@enumerate
+@item
+@acronym{CLOS, Common Lisp Object System}
+@cindex CLOS, influence of
+
+@item
+Slate, a Smalltalk-like language with Prototype Multiple Dispatch on which
+Sheeple bases its message dispatch system.
+@cindex Slate, influence of
+@cindex Smalltalk, influence of
+
+@item
+Self, another Smalltalk-like language with lots of papers written about it,
+the concept of prototype OO, and ways to implement similar languages efficiently.
+@cindex Self, influence of
+
+@item
+Io, a pure prototype-based language. Sheeple, like Io, implements differential
+inheritance as an important component of the language.
+@cindex Io, influence of
+@end enumerate
+
+It was written with the purpose of providing a lot of the goodies of @acronym{CLOS}
+programming in a completely prototype-based environment. As such, it shares a
+lot of features and syntax with @acronym{CLOS}. The most notable of these are multiple
+inheritance and multiple dispatch of methods.
+
+@page
+@node Installing Sheeple,  , About Sheeple, Overview
+@section Installing Sheeple
+
+@menu
+* Installation Procedure::      A quick guide to obtaining Sheeple
+* Supported Platforms::         In which systems and implementations does
+                                Sheeple currently perform best?
+* Loading Sheeple::             A quick guide to starting Sheeple
+@end menu
+
+@node Installation Procedure, Supported Platforms, Installing Sheeple, Installing Sheeple
+@subsection Installation Procedure
+@cindex Installation
+@cindex Github
+There are two primary ways to obtain Sheeple, namely, a tagged release, or a
+clone of the public repository, available via git. Unless you are interested in
+contributing to Sheeple development and/or studying Sheeple's internals, you
+should use a tagged release. Regardless of which method you use to obtain
+Sheeple, you will need to follow the directions in @ref{Informing ASDF}.
+
+@menu
+* Tagged Release::              Downloading a stable copy of Sheeple
+* Tracking the Git Repo::       Tracking the ``bleeding edge''
+* Informing ASDF::              Setting up a downloaded copy of Sheeple
+@end menu
+
+@node Tagged Release, Tracking the Git Repo, Installation Procedure, Installation Procedure
+@subsubsection Tagged Release
+@cindex release, latest
+@cindex downloading
+A tagged release is preferable for stability --- we test new features
+extensively before including them in a tagged release. At the time of
+this writing, the latest tagged release is available as a tarball from
+@uref{http://github.com/zkat/sheeple/tarball/@value{VERSION}}.
+
+@node Tracking the Git Repo, Informing ASDF, Tagged Release, Installation Procedure
+@subsubsection Tracking the Git Repo
+@cindex git repository
+@cindex bleeding edge of development
+Since all new features are developed and tested carefully before
+inclusion in tagged releases, the best way to track the ``bleeding
+edge'' of Sheeple development is through @command{git}. @command{git}
+is a sophisticated revision control system, used extensively by all of
+Sheeple's developers. A full overview of @command{git} is beyond the
+scope of this section; those interested should refer to the
+@uref{http://www.kernel.org/pub/software/scm/git/docs/user-manual.html,
+Git Manual}.
+
+For reference purposes, you can browse Sheeple's git repository online through
+@uref{http://github.com/zkat/sheeple}. If you wish to contribute to the
+project, this command will create a copy of the Sheeple repository on your local
+machine:
+
+@example
+git clone git://github.com/zkat/sheeple.git
+@end example
+
+@strong{Caution:} Even if you do not wish to contribute to Sheeple, the above
+command will still create a copy of the git repository on your local machine.
+
+@node Informing ASDF,  , Tracking the Git Repo, Installation Procedure
+@subsubsection Informing ASDF
+@cindex ASDF
+@cindex Windows
+Sheeple is organized using @acronym{@dfn{ASDF}, Another System Definition
+Facility}, the standard (at the time of this writing) system-definition facility
+for Common Lisp programs. For more information about @acronym{ASDF}, you should
+refer to the @acronym{ASDF}
+@uref{http://common-lisp.net/project/asdf/manual.html, Manual}; the rest of this
+section assumes that you are familiar with the basic concepts of @acronym{ASDF},
+and have configured your implementation to use it.
+
+If your implementation does not include @acronym{ASDF}, you will have to acquire
+it and load it separately. Up-to-date information on installing @acronym{ASDF}
+should be available via the @acronym{ASDF} @uref{http://www.cliki.net/asdf,
+CLiki page}; The official @acronym{ASDF}
+@uref{http://common-lisp.net/project/asdf, Project webpage} should also have the
+relevant information.
+
+To complete a Sheeple installation, you must inform @acronym{ASDF} where it can
+find the file @file{sheeple.asd}. Substituting @var{registry} and @var{sheeple}
+for your @acronym{ASDF} registry and the directory of your Sheeple installation,
+these commands should work on any @acronym{UNIX}-like system:
+
+@example
+cd @var{registry}
+ln -s @var{sheeple}/sheeple.asd .
+@end example
+
+This method does not work on Windows, which does not support symbolic links. If
+you have to deal with setting up @acronym{ASDF} systems on Windows, you may find
+the @uref{http://common-lisp.net/project/asdf-install/tutorial/index.html,
+ASDF-Install Tutorial} useful --- it contains notes on getting @acronym{ASDF} to
+work on Windows.
+
+@node Supported Platforms, Loading Sheeple, Installation Procedure, Installing Sheeple
+@subsection Supported Platforms
+@cindex platforms, supported
+@cindex supported platforms
+Confirmed to work (pass all tests):
+
+@enumerate
+@cindex Steel Bank Common Lisp
+@item
+SBCL 1.0.33
+
+@cindex Clozure Common Lisp
+@cindex OpenMCL
+@item
+Clozure CL 1.4
+
+@cindex GNU CLISP
+@item
+GNU CLISP 2.48
+
+@c @cindex Allegro Common Lisp
+@c @item
+@c Allegro CL 8.1
+@end enumerate
+
+Sheeple doesn't use any OS-specific code (or threads), so it should be stable on
+all operating systems. Sheeple has been tested on OSX, Linux, and Windows
+Vista. In theory, it should work on any implementation that supports hash tables
+with key weakness. If you run the test suite on a platform not listed above, and
+all tests pass, please e-mail me and I'll add it to the list of supported
+platforms.
+
+@node Loading Sheeple,  , Supported Platforms, Installing Sheeple
+@subsection Loading Sheeple
+@cindex loading
+Once you have followed the installation instructions (@pxref{Installation
+Procedure}), loading Sheeple into a Lisp image is as simple as:
+
+@lisp
+(asdf:oos 'asdf:load-op 'sheeple)
+(in-package :sheeple-user)
+@end lisp
+
+Sheeple should work on most Lisp implementations that support weak tables with key weakness,
+although it's mainly written and tested in SBCL and Clozure CL on Linux x86(-64).
+
+Sheeple also includes a suite of tests you can run on whatever platform you're
+trying to get it to work on. The test suite depends on Fiveam. To run it:
+
+@lisp
+(asdf:oos 'asdf:test-op 'sheeple)
+@end lisp
+
+And watch the tests scroll by. All tests should pass as long as you're using a
+tagged release.
+
+@node API Documentation, API Index, Overview, Top
+@chapter API Documentation
+
+@menu
+* Objects::
+* Properties::
+* Messages::
+@end menu
+
+@node Objects, Properties, API Documentation, API Documentation
+@section Objects
+
+@subsection Introduction to Objects
+Sheeple is an object system completely oriented around objects. Unlike most
+other object-oriented systems, Sheeple does not have a separate concept of a
+class as a type definition mechanism that 'instances' are then created from.
+
+Instead, Sheeple uses objects, and only objects, to define the behavior of
+systems programmed with it. Programs are shaped by defining properties on
+objects, establishing relationships between objects, copying objects, and
+defining how objects participate together in messages, which define behavior.
+
+There are various ways to create new objects in Sheeple. The two core
+object-creation facilities are @code{OBJECT}, which creates a new empty object
+by default, and @code{CLONE}, which shallow-copies an existing object's
+characteristics.
+
+Beyond @code{OBJECT} and @code{CLONE}, operators like @code{MAKE} and
+@code{DEFPROTO} provide more advanced creation facilities on top of
+@code{OBJECT} and @code{CLONE}, but are strictly for convenience.
+
+@menu
+* Delegation::
+* Prototypes::
+* Autoboxing::
+* Built-in Objects::
+* Boxed-Object Hierarchy::
+* Objects Dictionary::
+@end menu
+
+@node Delegation, Prototypes, Objects, Objects
+@subsection Delegation
+Sheeple supports the runtime sharing of data and behavior. Instead of a
+fine-grained system where data is shared on a per-property basis, both data and
+behavior are shared as a whole by establishing parent/child relationships
+between objects, forming a DAG (directed acyclic graph) data structure of
+Sheeple objects which determines how and where data and behavior are shared.
+
+Relationships can be established in a number of ways. The @code{OBJECT} function
+may be used, and given a sequence of parents that will be added to the new
+object as soon as it is created. Using @code{(SETF OBJECT-PARENTS)} at any time
+after object creation will also alter the object's list of parents. Objects
+created by @code{CLONE} automatically inherit the cloned object's list of
+parents, although that list may subsequently be changed.
+
+A single object can have multiple parents, and multiple children, and Sheeple
+uses the C3 algorithm to resolve inheritance precedence for data and behavior
+when multiple inheritance is involved. A readable list of parents belonging to a
+particular object can be accessed by calling @code{OBJECT-PARENTS}. An object's
+sorted list of ancestors, which determines the order in which objects are
+queried for data and behavior from most specific to least specific, can be
+queried with @code{OBJECT-PRECEDENCE-LIST}.
+
+Just as relationships can be made, though, relationships can be
+unmade. @code{(SETF OBJECT-PARENTS)} is able to alter, reorder, and otherwise
+set an existing object's parent list at any time after object creation.
+
+There are some limitations on an object's parent list: First, it is an error for
+any object except =T= to have an empty parent list. Second, standard objects
+must all have =STANDARD-OBJECT= and =T= as the last two items in their precedence
+list, in that order. Finally, the graph generated by a series of connected
+objects must be acyclic. Failing to fulfill any of these conditions is an error.
+
+A convenient way of inspecting a Sheeple object and its characteristics while
+working interactively is to use the DESCRIBE lisp function. This will pretty
+print several useful bits of information about the object, such as its list of
+parents.
+
+@node Prototypes, Autoboxing, Delegation, Objects
+@subsection Prototypes
+As mentioned before, Sheeple does not have a distinct concept of classes as type
+definitions. Nevertheless, it is often the case while writing an object-oriented
+application that a single object might be used as an exemplar which many other
+objects use as a parent. An object that is mainly created with the purpose of
+having other objects inheriting data and behavior from it is called a
+``prototype''.
+
+In Sheeple, a prototype can be any object, and all the usual rules for them
+apply. On the other hand, Sheeple provides certain facilities that make dealing
+with this prototype pattern simpler. The most important of these is the macro
+@code{DEFPROTO}. This macro is a wrapper around @code{OBJECT} that adds some
+convenience sugar such as an easier method for defining property values and
+accessors, options for objects, and automatically binding the new new object to
+a variable (the ``prototype name''). Additionally, @code{DEFPROTO} supports the
+redefinition of the same object by simply re-evaluating a @code{DEFPROTO} form
+that refers to the object, which will take care of adding/removing any
+properties. This is supported by automatically calling @code{REINIT-OBJECT} if
+the prototype already existed.
+
+By convention, prototypes in Sheeple use a naming scheme where the name of the
+prototype is wrapped in = signs (``=FOO=''). This is purely a naming convention,
+and all built-in prototypes in the Sheeple system are named in this way.
+
+@node Autoboxing, Built-in Objects, Prototypes, Objects
+@subsection Autoboxing
+Sheeple autoboxes a limited number of lisp types, and lisp objects of those
+type. This allows certain limited behaviors to be performed by Sheeple's message
+system, such as dispatching on non-sheeple objects. The method by which these
+objects are boxed and kept track of, though, is still in flux.
+
+@node Built-in Objects, Boxed-Object Hierarchy, Autoboxing, Objects
+@subsection Built-in Objects
+On top of providing facilities for creating objects and managing them, Sheeple
+also includes a series of built-in objects.  These built-in objects, exported
+from the @code{SHEEPLE} package, play special roles in Sheeple. The consequences
+of modifying these objects from user code are undefined.
+
+@macro sheeplebuiltin{name, concept, description}
+@cindex \concept\
+@vindex \name\
+@item \name\
+\description\
+@end macro
+
+@table @code
+@sheeplebuiltin{=T=,ancestral object, An ancestor of every other
+object@comma{} and is the only object with no parents. It sits at the obsolute
+top of all object hierarchies acting important.}
+
+@sheeplebuiltin{=STANDARD-OBJECT=,standard object, An ancestor of all
+normally-defined objects. It has @code{=T=} as its only parent. It is
+mostly used for reply specialization@comma{} and in termination cases
+for functions which recurse up the parent-child hierarchy.}
+
+@ifset mop
+@sheeplebuiltin{=STANDARD-METAOBJECT=,standard metaobject, This object
+is the metaobject of all normally-defined objects. It is the root of
+the MOP@comma{} and many MOP functions are specialized upon it or use
+it as a reference point. It has @code{=T=} as its only parent.}
+@end ifset
+@end table
+
+@node Boxed-Object Hierarchy, Objects Dictionary, Built-in Objects, Objects
+@subsection Boxed-Object Hierarchy
+
+@table @code
+@sheeplebuiltin{=BOXED-OBJECT=,boxed objects, The ancestor of all
+boxed objects@comma{} it has @code{=T=} as its only parent@comma{} and
+many children. Each newly-boxed object traces its lineage up through
+this object.}
+
+@macro sheepleboxedin{name, concept, description}
+@sheeplebuiltin{\name\,\concept\, The boxed object representing
+\description\.}
+@end macro
+
+@sheepleboxedin{=SYMBOL=,symbol, native Lisp symbols@comma{} this
+object has @code{=BOXED-OBJECT=} as its only parent. Each newly-boxed
+symbol has this object as a parent}
+
+@sheepleboxedin{=SEQUENCE=,sequence, sequences@comma{} this object's
+job is primarily to be a parent for the boxed objects representing
+actual sequence types@comma{} and it has @code{=BOXED-OBJECT=} as its
+only parent}
+
+@sheepleboxedin{=ARRAY=,array, arrays of all dimensions@comma{} with
+@code{=BOXED-OBJECT=} as its only parent}
+
+@sheepleboxedin{=NUMBER=,number, all numerical types@comma{} similar
+to the native type @code{NUMBER}@. This object has
+@code{=BOXED-OBJECT=} as its only parent}
+
+@sheepleboxedin{=CHARACTER=,character, characters and glyphs@comma{}
+and has @code{=BOXED-OBJECT=} as its only parent}
+
+@sheepleboxedin{=FUNCTION=,function, functions@comma{} and has no
+children@comma{} and @code{=BOXED-OBJECT=} as its only parent}
+
+@sheepleboxedin{=HASH-TABLE=,hash table, hash tables@comma{} large
+mappings of key--value pairs used in Common Lisp as a replacement for
+large alists. It has @code{=BOXED-OBJECT=} as its only parent}
+
+@sheepleboxedin{=PACKAGE=,package, Common Lisp packages. This object
+has only one parent -- @code{=BOXED-OBJECT=}}
+
+@sheepleboxedin{=PATHNAME=,pathname, pathnames. It has
+@code{=BOXED-OBJECT=} as its only parent}
+
+@sheepleboxedin{=READTABLE=,readtable, tables of readmacros. While it
+is rare to deal with these programmatically@comma{} Sheeple still
+allows you to do so. This object has @code{=BOXED-OBJECT=} as its only
+parent}
+
+@sheepleboxedin{=STREAM=,stream, any one of the many stream
+classes. This object has @code{=BOXED-OBJECT=} as its only parent}
+
+@sheepleboxedin{=LIST=,list, Lisp's classic data structure@comma{} the
+linked list@comma{} this object has @code{=SEQUENCE=} as its only
+parent}
+
+@sheepleboxedin{=NULL=,null, The boxed object representing the native
+Lisp type @code{NULL}@comma{} this object has @code{=SYMBOL=} and
+@code{=LIST=} as its two parents. The only native Lisp object which
+should box to this is the empty list itself}
+
+@sheepleboxedin{=CONS=,cons, Lisp's key low-level data type@comma{}
+and has @code{=LIST=} as its only parent}
+
+@sheepleboxedin{=VECTOR=,vector, the workhorse of efficient Common
+Lisp code -- one-dimensional arrays@comma{} known as vectors. This
+object has both @code{=ARRAY=} and @code{=SEQUENCE=} as parents}
+
+@sheepleboxedin{=BIT-VECTOR=,bit vector, bit vectors@comma{} a common
+subtype of vectors. This object has @code{=VECTOR=} as its only parent}
+
+@sheepleboxedin{=STRING=,string, strings of characters@comma{} also a
+very common data type in Common Lisp. It has @code{=VECTOR=} as its
+only parent}
+
+@sheepleboxedin{=COMPLEX=,complex numbers, complex numbers@comma{} one
+of the three main divisions of numeric types in Common Lisp. It has
+@code{=NUMBER=} as its only parent}
+
+@sheepleboxedin{=INTEGER=,integers, integers@comma{} both fixnums and
+bignums. It has @code{=NUMBER=} as its only parent}
+
+@sheepleboxedin{=FLOAT=,floating-point numbers, floating-point numbers
+of all kinds@comma{} and it has @code{=NUMBER=} as its only parent}
+@end table
+
+@node Objects Dictionary,  , Boxed-Object Hierarchy, Objects
+@subsection Objects Dictionary
+
+@menu
+* object::
+* clone::
+* defobject::
+* defproto::
+* parentp::
+* ancestorp::
+* childp::
+* descendantp::
+* object-parents::
+* object-precedence-list::
+@end menu
+
+@node object, clone, Objects Dictionary, Objects Dictionary
+@unnumberedsubsubsec object
+@defun {object} &rest all-keys &key (parents (list =standard-object=))
+                                    properties
+@ifset mop
+                                    (metaobject =standard-metaobject=)
+@end ifset
+                                    &allow-other-keys
+=> new-object
+
+@strong{Arguments and Values:}
+
+@var{all-keys} --- a list of keyword args.
+
+@var{parents} --- A list of objects.
+
+@var{new-object} --- a new object with @var{parents} as parents.
+
+@strong{Description:}
+
+@code{OBJECT} creates a new object.
+@ifset mop
+of @code{=STANDARD-METAOBJECT=}
+@end ifset
+with @var{parents} as its parents. Any non-sheeple objects in @var{parents} will
+be autoboxed and @emph{those} objects will be added as parents. The new object's
+parents will be ordered as they are given, taking into account that parents that
+appear earlier in the list have higher precedence. Passing an empty parent list or
+failing to pass one will automatically set @code{=STANDARD-OBJECT=} as the new
+object's sole parent.
+
+@strong{Examples:}
+
+@smallformat
+@verbatim
+(object) => #<Object [=STANDARD-OBJECT=] #x30004166BF6D>
+(object-parents (object)) => (#<Object =STANDARD-OBJECT= #x3000414A317D>)
+(object :parents (list (object))) => #<Object [=STANDARD-OBJECT=] #x3000414EBBED>
+@end verbatim
+@end smallformat
+
+@strong{Side Effects:}
+
+None
+@end defun
+
+@node clone, defobject, object, Objects Dictionary
+@unnumberedsubsubsec clone
+@defun {clone} object => new object
+
+@strong{Arguments and Values:}
+
+@var{object} --- an object.
+
+@var{new object} --- a new object; a clone of @var{object}
+
+@strong{Description:}
+
+@code{CLONE} creates a new object that is a sibling of @var{object}. This new
+object is a shallow-copy of @var{object} with the same parents, properties, and
+roles at the time @code{CLONE} was called.
+
+@end defun
+
+@node defobject, defproto, clone, Objects Dictionary
+@unnumberedsubsubsec defobject
+@defmac {defobject} @{parent-objects@} (@{property-spec@}*) option-spec*
+=> new-object
+
+@smallformat
+@verbatim
+parent-objects ::= {object | (object*)}
+property-spec ::= (property-name property-value property-option*)
+property-name ::= symbol
+property-value ::= object
+property-option ::= {:reader {reader-message-name | nil}}* |
+                    {:writer {writer-message-name | nil}}* |
+                    {:accessor {reader-message-name | t | nil}}*
+message-name ::= {symbol | (quote (setf symbol))}
+option-spec ::= :nickname lisp-object |
+                :documentation docstring
+@end verbatim
+@end smallformat
+
+@strong{Arguments and Values:}
+
+@var{parent-object} --- an object.
+
+@var{property-name} --- a symbol, not evaluated.
+
+@var{property-value} --- a form, evaluated to produce the value for property.
+
+@var{reader/writer/accessor} --- can be supplied more than once for each
+property. If NIL is given for any of these, signals an error if there is another
+matching definition. :accessor creates both a reader and a writer with format
+(accessor-name sheep-object) (setf (accessor-name sheep-object) new-value).
+Providing T as the argument to :accessor automatically creates an accessor for
+that property using the given property name.
+
+@var{nickname} --- a form, evaluated to produce the nickname for
+@var{new-object}, preferably a symbol.
+
+@var{documentation} --- a string of documentation for the new sheep.
+
+@var{new-object} --- an object, constructed according to the arguments.
+
+@strong{Description:}
+
+@code{DEFOBJECT} creates a new object with all the @var{parent-object}s as
+parents. After the new object has been initialized, @var{direct-properties}
+are added to it during SHARED-INIT, using (SETF PROPERTY-VALUE), based on @var{property-spec}.
+
+@strong{Examples:}
+
+@smallformat
+@verbatim
+(defobject () ((var "value"))) => #<Object [=STANDARD-OBJECT=] #x30004157569D>
+(defobject * ()) => #<Object [=STANDARD-OBJECT=] #x30004158008D>
+(object-parents *) => (#<Object [=STANDARD-OBJECT=] #x30004157569D>)
+(available-properties **) => (VAR NICKNAME)
+@end verbatim
+@end smallformat
+
+@strong{Side Effects:}
+
+@end defmac
+
+@node defproto, parentp, defobject, Objects Dictionary
+@unnumberedsubsubsec defproto
+@defmac {defproto} proto-name @{parent-objects@} (@{property-spec@}*) option-spec*
+=> new-object
+
+@smallformat
+@verbatim
+proto-name ::= symbol
+parent-objects ::= {object | (object*)}
+property-spec ::= (property-name property-value property-option*)
+property-name ::= symbol
+property-value ::= object
+property-option ::= {:reader {reader-message-name | nil}}* |
+                    {:writer {writer-message-name | nil}}* |
+                    {:accessor {reader-message-name | t | nil}}*
+message-name ::= {symbol | (quote (setf symbol))}
+option-spec ::= :nickname lisp-object |
+                :documentation docstring
+@end verbatim
+@end smallformat
+
+@strong{Arguments and Values:}
+
+@var{proto-name} --- a non-keyword symbol.
+
+@var{parent-object} --- an object, to be added as a parent.
+
+@var{property-name} --- a symbol, not evaluated.
+
+@var{property-value} --- a form, evaluated to produce an initial value for the
+corresponding property @var{property-name}.
+
+@var{reader/writer/accessor} --- can be supplied more than once for each
+property. If NIL is given for any of these, signals an error if there is another
+matching definition. :accessor creates both a reader and a writer with format
+(accessor-name object) (setf (accessor-name object)
+new-value). Providing T as the argument to :accessor automatically creates an
+accessor for that property using the given property name.
+
+@var{nickname} --- a form, evaluated to produce the nickname for
+@var{new-object}, preferably a symbol.
+
+@var{documentation} --- a string of documentation for the new object.
+
+@var{new-object} --- an object, constructed according to the arguments.
+
+@strong{Description:}
+
+@code{DEFPROTO} creates a new object with all the @var{parent-object}s as
+parents, and creates a dynamic binding for the symbol @var{proto-name} to the
+object.
+
+After the object has been initialized, @var{direct-properties}, readers, writers,
+and accessors are added to the new object based on each @var{property-spec}.
+Unlike @code{DEFOBJECT}, @code{DEFPROTO} automatically defines accessors for each
+@var{property-spec} using its @var{property-name}. This behavior can be
+overridden by passing a :reader, :writer, and/or :accessor option.
+
+Unless given a :nickname option, @code{DEFPROTO} uses @var{proto-name} as the
+new object's nickname.
+
+If a @code{DEFPROTO} form is evaluated when the @var{proto-name} already points
+to an existing sheep, @code{REINIT-OBJECT} is called on the existing object to
+clear out the current parents and properties and set them according to the
+@var{parent-object}s and @var{property-spec}s in the call to @code{DEFPROTO}@.
+
+@strong{Examples:}
+
+@smallformat
+@verbatim
+(defproto =test-proto= () ()) => #<Object =TEST-PROTO= #x300041602BFD>
+(defproto =test-proto= () ((var "value"))) => #<Object =TEST-PROTO=#x300041602BFD>
+;; Identity is maintained, but =test-proto= now has a new property. Removing it
+;; in the form will remove it from the object:
+(defproto =test-proto= () ()) => #<Object =TEST-PROTO= #x300041602BFD>
+(available-properties *) => (NICKNAME)
+@end verbatim
+@end smallformat
+
+@strong{Notes:}
+
+It is customary to name prototype objects with an equals-sign (@kbd{=}) at the
+beginning and end of the name. For example, @var{=foo=} is a good name for a
+prototype. This naming convention is observed for all included objects in
+the Sheeple library; however, programs are not required to adhere to it.
+@end defmac
+
+@node parentp, ancestorp, defproto, Objects Dictionary
+@unnumberedsubsubsec parentp
+@defun {parentp} maybe-parent child
+=> generalized-boolean
+
+@strong{Arguments and Values:}
+
+@var{maybe-parent} --- an object.
+
+@var{child} --- an object.
+
+@strong{Description:}
+
+Returns true if @var{maybe-parent} is a parent of @var{child}, false otherwise.
+
+@strong{Examples:}
+
+@smallformat
+@verbatim
+(parentp =T= =STANDARD-OBJECT=) => Generalized truth value
+(parentp =STANDARD-OBJECT= =T=) => NIL
+@end verbatim
+@end smallformat
+@end defun
+
+@node ancestorp, childp, parentp, Objects Dictionary
+@unnumberedsubsubsec ancestorp
+@defun {ancestorp} maybe-ancestor descendant
+=> generalized-boolean
+
+@strong{Arguments and Values:}
+
+@var{maybe-ancestor} --- an object.
+
+@var{descendant} --- an object.
+
+@strong{Description:}
+
+Returns true if @var{maybe-descendant} is an ancestor of @var{descendant}, false
+otherwise.
+
+@strong{Examples:}
+
+@smallformat
+@verbatim
+(ancestorp =STANDARD-SHEEP= (object :parents (list (object)))) => Generalized truth value
+@end verbatim
+@end smallformat
+@end defun
+
+@node childp, descendantp, ancestorp, Objects Dictionary
+@unnumberedsubsubsec childp
+@defun {childp} maybe-child parent
+=> generalized-boolean
+
+@strong{Arguments and Values:}
+
+@var{maybe-child} --- an object.
+
+@var{parent} --- an object.
+
+@strong{Description:}
+
+Returns true if @var{maybe-child} is a child of @var{parent}, false otherwise.
+
+@strong{Examples:}
+
+@smallformat
+@verbatim
+(childp (object) =STANDARD-OBJECT=) => Generalized truth value
+(childp (object) =T=) => NIL
+@end verbatim
+@end smallformat
+@end defun
+
+@node descendantp, object-parents, childp, Objects Dictionary
+@unnumberedsubsubsec descendantp
+@defun {descendantp} maybe-descendant ancestor
+=> generalized-boolean
+
+@strong{Arguments and Values:}
+
+@var{maybe-descendant} --- an object.
+
+@var{ancestor} --- an object.
+
+@strong{Description:}
+
+Returns true if @var{maybe-descendant} is a descendant of @var{ancestor}, false
+otherwise.
+
+@strong{Examples:}
+
+@smallformat
+@verbatim
+(descendantp (object) =STANDARD-OBJECT=) => Generalized truth value
+(descendantp (object) =T=) => Generalized truth value
+@end verbatim
+@end smallformat
+@end defun
+
+@node object-parents, object-precedence-list, descendantp, Objects Dictionary
+@unnumberedsubsubsec object-parents
+@defun {object-parents} object => parents
+
+@strong{Arguments and Values:}
+
+@var{object} --- an object.
+
+@var{parents} --- A list of objects
+
+@strong{Description:}
+
+Returns a list of objects representing @var{object}'s parents.
+
+The macro @code{SETF} may be used to set a new list as @var{object}'s list of parents.
+
+@strong{Exceptional Situations:}
+
+The consequences are undefined if destructive operations are performed on the
+list returned by @code{OBJECT-PARENTS}.
+
+@end defun
+
+@node object-precedence-list,  , object-parents, Objects Dictionary
+@unnumberedsubsubsec object-precedence-list
+@defun {object-precedence-list} object => precedence-list
+
+@strong{Arguments and Values:}
+
+@var{object} --- an object.
+
+@var{precedence-list} --- a list of objects
+
+@strong{Description:}
+
+Returns a list of objects representing an ordered set of @var{object} and its
+ancestors. This same ordering of objects will be traversed by Sheeple when
+behavior that involves delegation is triggered, such as delegated property
+access or reply dispatch.
+
+@strong{Exceptional Situations:}
+
+The consequences are undefined if the user directly side-effects @var{precedence-list}.
+
+@end defun
+
+@node Properties, Messages, Objects, API Documentation
+@section Properties
+
+@subsection Introduction to Properties
+A Sheeple object can have zero or more ``properties''. Properties index data
+held by an object with a symbol. They can be added, removed, and changed at any
+time for standard Sheeple objects. Additionally, descendants can access
+properties available somewhere in their precedence list.
+
+Available properties can be accessed in a number of ways. The core method of
+doing so is the ``@ref{property-value}'' function, which returns a property
+value indexed by an index. @ref{direct-property-value} may also be used, and it
+will not trigger delegation. If a property is accessed with either of these, but
+it is not available, an error of type @code{UNBOUND-PROPERTY} is signaled.
+
+A property may be added to an existing Sheeple object by simply setting it with
+@ref{setf property-value,(setf property-value)}. This function will change the
+value of an existing property, or add a brand new property to the object and set
+the value if it did not already exist.
+
+A property existing directly on a Sheeple object may be removed by using
+@ref{property-makunbound}, or all direct properties may be removed using
+@ref{remove-all-direct-properties}.
+
+Finally, Sheeple provides some convenient mechanisms for inspecting and
+exploring the properties of an object, and information about those
+properties. @ref{direct-properties} and @ref{available-properties} may
+be used to retrieve a list of names associated with the properties of an
+object. Using DESCRIBE on the object provides a more helpful interactive
+interface to inspecting properties, as well.
+
+@menu
+* Property Delegation::
+* Special Properties::
+* Properties Dictionary::
+@end menu
+
+@node Property Delegation, Special Properties, Properties, Properties
+@subsection Property delegation
+One unique aspect of Sheeple's approach to object orientation is the concept of
+differential inheritance, sometimes called ``delegation''. Property delegation
+involves the dynamic lookup of property values by searching an object's
+precedence list for an ancestor with a valid property value for a property when
+direct property lookup on that object fails. In Sheeple, this lookup is
+triggered by @code{PROPERTY-VALUE}, but not by @code{DIRECT-PROPERTY-VALUE}.
+
+This sort of ``inheritance'' for values is a characteristic usually limited to
+so-called prototype-based programming languages, and conceptually extends the
+concept of forwarding messages to superclasses, into the world of objects and
+values, instead of only behavior.
+
+Sheeple distinguishes between two types of properties: direct properties, and
+available properties. The first is any property that is available directly from
+an object. The value for a direct property is not delegated to any ancestor. An
+available property, on the other hand, is a property that is either direct, or
+that is being delegated to some ancestor in the object's precedence list. From
+these two concepts, a delegated property can be identified by determining
+whether a particular property is available, but not direct.
+
+While a particular object may have the possibility of having multiple available
+properties if multiple ancestors define that property, there is only ever one
+available property-value for any given property, with a property available at
+a more specific ancestor will take precedence over all other ancestors',
+determined by the object's precedence list, and direct-properties taking
+precedence over all others. Simply put, a more specific property value shadows
+all other possibly available values. A property is considered to be unbound for
+an object if and only if there is no direct property by that name defined for
+the object either directly, or for any of its ancestors.
+
+It is important to note that @code{(SETF PROPERTY-VALUE)} is only able to assign
+direct property values only, and @code{PROPERTY-MAKUNBOUND} is only able to remove
+direct properties. Thus, it is not possible to change an ancestor's direct
+property through the child (unless the value itself is side-effected), nor is it
+possible for a property to be unbound in a descendant with an ancestor that
+holds a direct value for that property.
+
+@node Special Properties, Properties Dictionary, Property Delegation, Properties
+@subsection Special Properties
+There are two special properties that all Sheeple objects have access to:
+@code{DOCUMENTATION} and @code{NICKNAME}. Both are relatively internal
+properties, and are not meant to be accessed through @code{PROPERTY-VALUE}.
+
+The first holds documentation data (preferably a string). It can be accesed
+through Lisp's own @code{DOCUMENTATION} generic function, and set in that
+place.
+
+@code{NICKNAME} is a special property that can be set if it is convenient to
+give a particular object a visible ``name'' that can be used as a more
+convenient identifier than simply an identity printout. It can be accessed and
+set through @code{OBJECT-NICKNAME}. All objects defined by @code{DEFPROTO}
+automatically receive the prototype name as their nickname unless a :nickname
+option is provided in the @code{DEFPROTO} form.
+
+Both of these properties will be delegated, like any regular Sheeple property.
+
+@node Properties Dictionary,  , Special Properties, Properties
+@subsection Properties Dictionary
+
+@menu
+* property-value::
+* direct-property-value::
+* setf property-value::
+* property-makunbound::
+* remove-all-direct-properties::
+* direct-properties::
+* available-properties::
+* direct-property-p::
+* property-owner::
+* object-nickname::
+* with-properties::
+@end menu
+
+@node property-value, direct-property-value, Properties Dictionary, Properties Dictionary
+@unnumberedsubsubsec property-value
+@defun {property-value} object property-name
+        => value
+
+@strong{Arguments and Values:}
+
+@var{object} --- an object.
+
+@var{property-name} --- a symbol, representing the name of the property to be accessed.
+
+@var{value} --- The value of the property.
+
+@strong{Description:}
+
+@code{PROPERTY-VALUE} searches @var{object}'s precedence list for the first
+object with a direct property named by @var{property-name}.
+
+If no ancestors hold a direct property by that name, a condition of
+type @code{UNBOUND-PROPERTY} is signaled.
+
+@end defun
+
+@node direct-property-value, setf property-value, property-value, Properties Dictionary
+@unnumberedsubsubsec direct-property-value
+@defun {direct-property-value} object property-name
+        => value
+
+@strong{Arguments and Values:}
+
+@var{object} --- an object.
+
+@var{property-name} --- a symbol, representing the name of the property to be accessed.
+
+@var{value} --- The value of the property.
+
+@strong{Description:}
+
+@code{DIRECT-PROPERTY-VALUE} looks for a direct property of @var{object} named
+by @var{property-name}. It does not search @var{object}'s precedence list.
+
+If @var{object} does not hold a direct property by that name, a condition of
+type @code{UNBOUND-PROPERTY} is signaled.
+
+@end defun
+
+@node setf property-value, property-makunbound, direct-property-value, Properties Dictionary
+@unnumberedsubsubsec (setf property-value)
+@defun {setf property-value} new-value object property-name
+           &key reader writer accessor
+=> new-value
+
+@strong{Arguments and Values:}
+
+@var{new-value} --- A value to set the property to.
+
+@var{object} --- An object.
+
+@var{property-name} --- A symbol which names the property to set.
+
+@var{reader} --- A symbol, T, or NIL
+
+@var{writer} --- A symbol, T, or NIL
+
+@var{accessor} --- A symbol, T, or NIL
+
+@strong{Description:}
+
+@code{(SETF PROPERTY-VALUE)} will set @var{new-value} as one of @var{object}'s
+direct properties. If @var{property-name} names an existing direct property, the
+value is changed. If @var{property-name} is not already a direct property
+of @var{object}, the new value is set locally, and will shadow any values for
+that property that have been set in @var{object}'s precedence list.
+
+@end defun
+
+@node property-makunbound, remove-all-direct-properties, setf property-value, Properties Dictionary
+@unnumberedsubsubsec property-makunbound
+@defun {property-makunbound} object property-name
+       => object
+
+@strong{Arguments and Values:}
+
+@var{object} --- An object.
+
+@var{property-name} --- A symbol naming a direct property of @var{object}.
+
+@strong{Description:}
+
+@code{PROPERTY-MAKUNBOUND} will remove only a @strong{direct} property
+from @var{object}. This will make the property unbound (only directly).
+
+Attempting to remove a property which isn't direct will signal a condition of
+type @code{UNBOUND-PROPERTY}.
+
+@end defun
+
+@node remove-all-direct-properties, direct-properties, property-makunbound, Properties Dictionary
+@unnumberedsubsubsec remove-all-direct-properties
+@defun {remove-all-direct-properties} object
+       => object
+
+@strong{Arguments and Values:}
+
+@var{object} --- An object.
+
+@strong{Description:}
+
+This function will remove any and all direct-properties currently stored in @var{object}.
+
+@end defun
+
+@node direct-properties, available-properties, remove-all-direct-properties, Properties Dictionary
+@unnumberedsubsubsec direct-properties
+@defun {direct-properties} object
+       => direct-properties
+
+@strong{Arguments and Values:}
+
+@var{object} --- An object.
+
+@var{direct-properties} --- A list of symbols.
+
+@strong{Description:}
+
+Returns a list of symbols naming @var{object}'s direct properties.
+
+@strong{Exceptional Situations:}
+
+The consequences are undefined if @var{direct-properties} is side-effected in
+any way.
+
+@end defun
+
+@node available-properties, direct-property-p, direct-properties, Properties Dictionary
+@unnumberedsubsubsec available-properties
+@defun {available-properties} object
+        => available properties
+
+@strong{Arguments and Values:}
+
+@var{object} --- An object.
+
+@var{available properties} --- A list of symbols.
+
+@strong{Description:}
+
+Returns a list of symbols representing all property-names for
+which @code{PROPERTY-VALUE} would return a value when called on @var{object}.
+
+@end defun
+
+@node direct-property-p, property-owner, available-properties, Properties Dictionary
+@unnumberedsubsubsec direct-property-p
+@defun {direct-property-p} object property-name
+        => boolean
+
+@strong{Arguments and Values:}
+
+@var{object} --- An object.
+
+@var{property-name} --- A symbol naming a property.
+
+@var{boolean} --- A generalized boolean.
+
+@strong{Description:}
+
+This function evaluates to true if @var{object} has a direct property
+named @var{property-name}, false otherwise.
+
+@end defun
+
+@node property-owner, object-nickname, direct-property-p, Properties Dictionary
+@unnumberedsubsubsec property-owner
+@defun  {property-owner} object property-name
+=> owner
+
+@var{object} --- An object.
+
+@var{property-name} --- A symbol naming a property.
+
+@var{owner} --- An object which @var{object} would be delegating property-value
+to.
+
+@strong{Description:}
+
+Returns the object, if any, from which @var{object} would fetch the value for
+@var{property-name}. If no such object exists, @code{PROPERTY-OWNER} returns
+NIL.
+
+@end defun
+
+@node object-nickname, with-properties, property-owner, Properties Dictionary
+@unnumberedsubsubsec object-nickname
+@defun {object-nickname} object
+=> nickname
+
+@var{object} --- An object.
+
+@var{nickname} --- A nickname (can be any lisp object, but preferably either a
+string or a symbol).
+
+@strong{Description:}
+
+This function returns the object's nickname. It is automatically set by
+@code{DEFPROTO}, and can be manually set by setting this place with SETF.
+
+@end defun
+
+@node with-properties,  , object-nickname, Properties Dictionary
+@unnumberedsubsubsec with-properties
+@defmac {with-properties} (property-entry*) object-form declaration* form*
+=> result*
+
+@smallformat
+@verbatim
+property-entry ::= property-name | (variable-name porperty-name)
+@end verbatim
+@end smallformat
+
+@strong{Arguments and Values:}
+
+@var{property-name} --- a property name; not evaluated.
+
+@var{variable-name} --- a variable name; not evaluated.
+
+@var{object-form} --- a form; evaluated to produce @var{object}.
+
+@var{object} --- an object.
+
+@var{declaration} --- a declare expression; not evaluated.
+
+@var{forms} --- an implicit progn.
+
+@var{results} --- the values returned by the forms.
+
+@strong{Description:}
+
+@code{WITH-PROPERTIES} establishes a lexical environment for referring to the
+properties in @var{object} named by the given @var{property-name}s as though they
+were lexically bound variables.
+
+Within this context the value of each property can be specified by using its
+name, or the corresponding @var{variable-name}, if one was passed for that
+property. Both @code{setf} and @code{setq} can be used to set the value of the
+property.
+
+@code{WITH-PROPERTIES} translates an appearance of @var{property-name} or
+@var{variable-name} as a variable into a call to @code{PROPERTY-VALUE}.
+
+@strong{Examples:} None
+
+@strong{Exceptional Situations:}
+
+The consequences are undefined if any property is not present in @var{object}.
+
+@strong{Notes:}
+
+A @code{WITH-PROPERTIES} expression of the form:
+@smallformat
+@verbatim
+(with-properties (property-entry1 ... property-entryn) instance-form form1 ... formk)
+@end verbatim
+@end smallformat
+expands into the equivalent of
+@smallformat
+@verbatim
+(let ((in instance-form))
+  (symbol-macrolet (Q1 ... Qn) form1 ... formk))
+@end verbatim
+@end smallformat
+where @code{Qi} is
+@smallformat
+@verbatim
+(property-entryi () (property-value in 'property-entry))
+@end verbatim
+@end smallformat
+if @code{property-entryi} is a symbol, and is
+@smallformat
+@verbatim
+(variable-namei () (property-value in 'property-namei))
+@end verbatim
+@end smallformat
+if @code{property-entryi} is of the form
+@smallformat
+@verbatim
+(variable-namei 'property-namei)
+@end verbatim
+@end smallformat
+
+Also, note that the standard macro @code{WITH-ACCESSORS} works on objects too.
+@end defmac
+
+@node Messages,  , Properties, API Documentation
+@section Messages
+
+@c @subsection Introduction to Messages
+@c TODO
+
+@c @subsection Messages
+@c TODO
+
+@c @subsection Replies
+@c TODO
+
+@menu
+* Messages Dictionary::
+@end menu
+
+@node Messages Dictionary,  , Messages, Messages
+@subsection Messages Dictionary
+@defmac {defmessage} name lambda-list {option}*
+
+@strong{Arguments and Values:}
+
+@var{name} --- A valid function name.
+
+@var{lambda-list} --- A message lambda-list.
+
+@var{option} --- A message option.
+
+@strong{Description:}
+
+Like CLOS' @code{DEFGENERIC}, @code{DEFMESSAGE} declares the basic blueprint for dispatch.
+
+@end defmac
+
+@defmac {defreply} name {qualifier}* specialized-lambda-list [[declaration* | documentation]] form*
+        => new-reply
+
+@strong{Arguments and Values:}
+
+@var{name} --- A valid message name.
+
+@var{qualifier} --- A reply qualifier.
+
+@var{specialized-lambda-list} --- A specialized reply lambda-list.
+
+@var{declaration} --- Function declarations.
+
+@var{documentation} --- A string, to be extracted as documentation.
+
+@var{form} --- A lisp form.
+
+@strong{Description:}
+
+Like CLOS' @code{DEFMETHOD}, @code{DEFREPLY} creates a method-like object,
+specialized on the objects given in @var{specialized-lambda-list}. The code
+in @var{form}* will dispatch when given an appropriate set of arguments.
+
+@end defmac
+
+@node API Index, Concept Index, API Documentation, Top
+@unnumbered API Index
+@printindex vr
+
+@node Concept Index, Copying, API Index, Top
+@unnumbered Concept Index
+@printindex cp
+
+@ifnottex
+@node Copying,  , Concept Index, Top
+@appendix Copying
+@insertcopying
+@end ifnottex
+
+@bye

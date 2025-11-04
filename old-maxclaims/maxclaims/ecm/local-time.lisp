@@ -1,0 +1,32 @@
+(uiop:define-package :ecm/local-time
+    (:use :cl :local-time)
+  (:reexport :local-time)
+  (:export #:pretty-print-timestring))
+(in-package :ecm/local-time)
+
+(defun pretty-print-timestring (timestring &key (stream nil)
+					     (nbsp nil))
+  (let (in-time)
+    (labels ((space (s)
+	       (if nbsp (write-string "&nbsp" s)
+		   (write-char #\Space s)))
+	     (pp (s)
+	       (map nil (lambda (c)
+			  (cond
+			    ((char= #\T c)
+			     (setf in-time t)
+			     (space s))
+			    ((char= #\Space c)
+			     (space s))
+			    ((and in-time
+				  (some (lambda (sign)
+					  (char= c sign))
+					"+-"))
+			     (space s)
+			     (write-char c s))
+			    (t (write-char c s))))
+		    timestring)))
+      (if stream
+	  (pp stream)
+	  (with-output-to-string (stream)
+	    (pp stream))))))

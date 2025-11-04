@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>YASEXML : Yet Another Symbolic Expression eXtensible Markup Language</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="title" content="YASEXML : Yet Another Symbolic Expression eXtensible Markup Language"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2014-09-14T22:09-0700"/>
+<meta name="author" content="Drew Crampsie"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  {margin-left:auto; margin-right:0px;  text-align:right;}
+  .left   {margin-left:0px;  margin-right:auto; text-align:left;}
+  .center {margin-left:auto; margin-right:auto; text-align:center;}
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top;  }
+  th.right  { text-align:center;  }
+  th.left   { text-align:center;   }
+  th.center { text-align:center; }
+  td.right  { text-align:right;  }
+  td.left   { text-align:left;   }
+  td.center { text-align:center; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  div.inlinetask {
+    padding:10px;
+    border:2px solid gray;
+    margin:10px;
+    background: #ffffcc;
+  }
+  textarea { overflow-x: auto; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">YASEXML : Yet Another Symbolic Expression eXtensible Markup Language</h1>
+
+<p>    <i>PWAP: Paradigms of Web Application Programming</i>
+</p>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Introduction</a></li>
+<li><a href="#sec-2">2 Example Use</a>
+<ul>
+<li><a href="#sec-2-1">2.1 HTML pages</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+YASEXML is just a very simple, yet grandly effective way of using
+s-expressions<sup><a class="footref" name="fnr-.1" href="#fn-.1">1</a></sup> to represent HTML/XML/SAX type elements and documents..
+</p>
+
+
+
+<pre class="example">(import 'yasexml:&lt;&gt;)
+</pre>
+
+
+
+<pre class="example">(princ 
+ (&lt;&gt; (paragraph :title "About YASEXML")
+   (&lt;&gt; " 
+- Source code itself is human-readable and machine-readable.
+- XML is primarily used to represent data. 
+- Sexps combine source and data.")
+   (&lt;&gt; (:text #\Newline))
+   (&lt;&gt; "By having a very simple macro, ") (&lt;&gt; b (&lt;&gt; "YASEXML:&lt;&gt;"))
+   (&lt;&gt; ", we can add XML and HTML into the very sexp mix.")))
+</pre>
+
+
+
+<pre class="example">&lt;paragraph title="About YASEXML"&gt; 
+- Source code itself is human-readable and machine-readable.
+- XML is primarily used to represent data. 
+- Sexps combine source and data.
+By having a very simple macro, &lt;b&gt;YASEXML:&amp;lt;&amp;gt;&lt;/b&gt;, we can add XML and HTML into the very sexp mix.&lt;/paragraph&gt;
+"&lt;paragraph title=\"About YASEXML\"&gt; 
+- Source code itself is human-readable and machine-readable.
+- XML is primarily used to represent data. 
+- Sexps combine source and data.
+By having a very simple macro, &lt;b&gt;YASEXML:&amp;lt;&amp;gt;&lt;/b&gt;, we can add XML and HTML into the very sexp mix.&lt;/paragraph&gt;"
+</pre>
+
+
+
+
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Example Use</h2>
+<div class="outline-text-2" id="text-2">
+
+
+
+</div>
+
+<div id="outline-container-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> HTML pages</h3>
+<div class="outline-text-3" id="text-2-1">
+
+
+<p>
+Since a lot of interfaces these days are web based, and the data
+language used to markup web pages, HTML, is nearly identical to
+XML/XHTML, ours YASEXML works great to generate such things.
+</p>
+<p>
+Let us say we have a list of strings, and we simply want to generate a
+<code>ul</code> with <code>li</code>'s:
+</p>
+
+
+
+<pre class="example">(&lt;&gt; (:handler (closure-html:make-string-sink))
+  (&lt;&gt; ul (dolist (i '(this is a big olde list of items)) 
+           (&lt;&gt; li (&lt;&gt; (:text i))))))
+</pre>
+
+
+
+<pre class="example">&lt;ul&gt;&lt;li&gt;THIS&lt;/li&gt;&lt;li&gt;IS&lt;/li&gt;&lt;li&gt;A&lt;/li&gt;&lt;li&gt;BIG&lt;/li&gt;&lt;li&gt;OLDE&lt;/li&gt;&lt;li&gt;LIST&lt;/li&gt;&lt;li&gt;OF&lt;/li&gt;&lt;li&gt;ITEMS&lt;/li&gt;&lt;/ul&gt;
+</pre>
+
+
+In HTML, it is viewed as the following :
+
+<ul><li>THIS</li><li>IS</li><li>A</li><li>BIG</li><li>OLDE</li><li>LIST</li><li>OF</li><li>ITEMS</li></ul>
+
+<p>
+Because of that, we can sort of meta-circularly use YASEXML to display
+it's own <code>CL:DOCUMENTATION</code>.
+</p>
+
+
+
+<pre class="example">(import 'yasexml:&lt;&gt;)
+(let ((docs (documentation '&lt;&gt; 'function)))
+  (&lt;&gt; pre (&lt;&gt; (:text docs))))  
+</pre>
+
+
+<p>
+<b>RESULTS:</b>
+</p>
+
+
+
+<pre class="example">&lt;pre&gt;=&amp;gt; /whatever &amp;amp;body returns/
+Example : (&amp;lt;&amp;gt; (:handler (cxml:make-string-sink
+                     :indentation 1))
+           (&amp;lt;&amp;gt; (test-tag :test-attribute "test-attribute-value")
+             (&amp;lt;&amp;gt; "Test Text as Tag" (&amp;lt;&amp;gt; (br)))
+             (&amp;lt;&amp;gt; (:text "Test :TEXT as Tag") 
+               (&amp;lt;&amp;gt; ("foo bar=baz" :bat "?"))
+               (&amp;lt;&amp;gt; (:text "Test " ":TEXT" "many strings"))
+               (&amp;lt;&amp;gt; `(:text ,(concatenate 
+                             'string "Test " ":TEXT "
+                              "many strings with backquote " 
+                              "and concatenate" ))
+                 (&amp;lt;&amp;gt; `(,(funcall (constantly 'backquoted-tag-name))
+                        ,@(list 'list "attribute")))))))
+             
+"&amp;lt;?xml version="1.0" encoding="UTF-8"?&amp;gt;
+&amp;lt;test-tag test-attribute="test-attribute-value"&amp;gt;
+ Test Text as Tag
+ &amp;lt;br/&amp;gt;
+ Test :TEXT as Tag
+ &amp;lt;foo bar=baz bat="?"/&amp;gt;
+ Test
+ :TEXT
+ many strings
+ Test :TEXT many strings with backquote and concatenate
+ &amp;lt;backquoted-tag-name list="attribute"/&amp;gt;
+&amp;lt;/test-tag&amp;gt;"&lt;/pre&gt;
+</pre>
+
+
+<pre>=&gt; /whatever &amp;body returns/
+Example : (&lt;&gt; (:handler (cxml:make-string-sink
+                     :indentation 1))
+           (&lt;&gt; (test-tag :test-attribute "test-attribute-value")
+             (&lt;&gt; "Test Text as Tag" (&lt;&gt; (br)))
+             (&lt;&gt; (:text "Test :TEXT as Tag") 
+               (&lt;&gt; ("foo bar=baz" :bat "?"))
+               (&lt;&gt; (:text "Test " ":TEXT" "many strings"))
+               (&lt;&gt; `(:text ,(concatenate 
+                             'string "Test " ":TEXT "
+                              "many strings with backquote " 
+                              "and concatenate" ))
+                 (&lt;&gt; `(,(funcall (constantly 'backquoted-tag-name))
+                        ,@(list 'list "attribute")))))))
+             
+"&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;test-tag test-attribute="test-attribute-value"&gt;
+ Test Text as Tag
+ &lt;br/&gt;
+ Test :TEXT as Tag
+ &lt;foo bar=baz bat="?"/&gt;
+ Test
+ :TEXT
+ many strings
+ Test :TEXT many strings with backquote and concatenate
+ &lt;backquoted-tag-name list="attribute"/&gt;
+&lt;/test-tag&gt;"</pre>
+
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+<p class="footnote"><sup><a class="footnum" name="fn-.1" href="#fnr-.1">1</a></sup> ORG-BLOCKQUOTE-START
+s-expressions, sexprs or sexps (for "symbolic expression") are a
+notation for nested list (tree-structured) data, invented for and
+popularized by the programming language Lisp, which uses them for
+source code as well as data.
+ &ndash; <a href="https://en.wikipedia.org/wiki/S-expression">https://en.wikipedia.org/wiki/S-expression</a>
+</p>
+</blockquote>
+
+
+
+
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<p class="date">Date: 2014-09-14T22:09-0700</p>
+<p class="author">Author: Drew Crampsie</p>
+<p class="creator"><a href="http://orgmode.org">Org</a> version 7.9.3f with <a href="http://www.gnu.org/software/emacs/">Emacs</a> version 24</p>
+<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>
+
+</div>
+</body>
+</html>

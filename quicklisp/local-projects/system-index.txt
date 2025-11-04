@@ -1,0 +1,10 @@
+ecm/ecm.asd
+pwap/pwap.asd
+sexpml/sexpml.asd
+max-ecm/max-ecm.asd
+yasexml/yasexml.asd
+maxclaims/ecm/ecm.asd
+maxclaims/maxclaims.asd
+maxclaims/maxclaims-ecm.asd
+maxclaims/max-ecm/max-ecm.asd
+maxclaims/relational-objects-for-lisp.asd

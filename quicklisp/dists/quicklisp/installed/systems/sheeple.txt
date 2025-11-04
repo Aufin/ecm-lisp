@@ -1,0 +1,1 @@
+dists/quicklisp/software/sheeple-20210124-git/sheeple.asd

@@ -1,0 +1,15 @@
+ecm/ecm.asd
+pwap/pwap.asd
+sexpml/sexpml.asd
+ecm.old.src/ecm.asd
+yasexml/yasexml.asd
+maxclaims/ecm/ecm.asd
+maxclaims/maxclaims.asd
+maxclaims/maxclaims-ecm.asd
+descriptions/descriptions.asd
+maxclaims/max-ecm/max-ecm.asd
+descriptions/descriptions-test.asd
+quux-hunchentoot/quux-hunchentoot.asd
+descriptions/descriptions.validation.asd
+maxclaims/relational-objects-for-lisp.asd
+descriptions/descriptions.serialization.asd

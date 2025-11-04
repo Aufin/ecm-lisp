@@ -1,0 +1,1 @@
+dists/quicklisp/software/trivial-features-20211209-git/trivial-features-tests.asd

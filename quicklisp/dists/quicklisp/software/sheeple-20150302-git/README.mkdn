@@ -1,0 +1,201 @@
+About Sheeple
+=============
+
+Vision
+------
+
+Sheeple is a Dynamic, CLOS-like, Delegative Prototype-based Object-Oriented Programming Framework
+(or "POOP Framework") that strives to optimize application flexibility, minimize cost while
+increasing value, maximize programmer resources, and empower application implementers to better
+assist them in leveraging modern paradigms in order to proactively achieve next-generation synergy
+in tomorrow's web 3.0 world. It is implemented in (mostly) ANSI Common Lisp. Sheeple is fully
+buzzword compliant.
+
+Sheeple was originally written as a persistent library for use with [Sykosomatic][1]. Because of a
+desire to use it in other applications, it was rewritten as a regular prototype object system and
+provided as a standalone library meant for general-purpose OO hackery.
+
+The goal of having a Sheeple-like persistent object store has not been abandoned. Instead, it's
+being implemented as a [separate library][2] using Sheeple's reflection features.
+
+Sheeple is inspired by a number of Object-Oriented systems, mainly:
+
+* [CLOS][3], the Common Lisp Object System.
+
+* [Slate][4], a Smalltalk-like language with Prototype Multiple Dispatch which lies at the root of
+  Sheeple's message dispatch system.
+
+* [Self][5], another Smalltalk-like language with much literature discussing both it and the
+  concept of prototype OO. The Self compiler's maps were also an inspiration for Sheeple's molds.
+
+* [Io][6], a pure prototype language build around differential inheritance.
+
+We are designing Sheeple with the purpose of providing the goodies of CLOS programming in a
+completely prototype-based environment. As such, Sheeple shares a lot of features and syntax with
+CLOS, most notably multiple inheritance and multiply-dispatched methods.
+
+Supported Platforms
+-------------------
+Confirmed to work (pass all tests):
+
+* SBCL 1.0.33
+* Clozure CL 1.4
+* GNU CLISP 2.48
+* Allegro CL 8.1
+
+Sheeple doesn't use any OS-specific code (or threads), so it should be stable on all operating
+systems. Sheeple has been tested on OSX, Linux, and Windows Vista. It should work on any
+implementation that supports both key-weak and value-weak hashtables. If you run the test suite on a
+platform not listed above, and all tests pass, please e-mail me and I'll add it to the list of
+supported platforms.
+
+Loading Sheeple
+---------------
+It's fairly effortless to get Sheeple working. To get started, simply
+
+         (require 'asdf)
+         (asdf:load-system 'sheeple)
+         (in-package sheeple-user)
+
+And mess around from there. Be aware that if your implementation does not include ASDF, you will
+have to acquire it and load it yourself. CLISP, for example, will require this. For information on
+how to do this, check out [Cliki][7], or the [ASDF Homepage][8].
+
+Sheeple also includes a suite of tests you can run on whatever platform you're trying to get it to
+work on. The test suite depends on [Eos][9]. To run it:
+
+         (asdf:oos 'asdf:test-op 'sheeple)
+
+And watch the tests scroll by. All tests should pass as long as you're using a tagged release on a
+supported platform.
+
+Mailing Lists
+-------------
+
+There are mailing lists set up in common-lisp.net. Please refer to [Sheeple's project page][10] for
+more information.
+
+Features
+--------
+
+* Dynamic object management tools (inspection of objects, addition/removal of properties, all
+  without requiring full redefinition/object updating).
+
+* Differential inheritance of property values
+
+* Efficient property access.
+
+* Mostly efficient dispatch (WIP)
+
+* Integration with built-in Lisp types through autoboxing.
+
+* Multiple inheritance with dynamic inspection and management (adding/removing) of parents.
+
+* Multiple dispatch on replies (methods) -- replies specialize on specific objects, and follow their
+  inheritance hierarchies. Reply definition is almost identical to the core of CLOS methods, and
+  shares similar semantics.
+
+* CLOS-style standard combination for replies (:before, :after, and :around)
+
+
+Using Sheeple
+=============
+
+Sheeple includes a user manual with a full CLHS-style specification of the API. The manual can be
+built from doc/, using make. This requires texinfo to be installed. A [prebuilt manual][11] in PDF
+format is also available..
+
+For a quicker introduction, you can also take a peek at the examples/ directory.
+
+As usual, you can always contact me directly with questions. I also regularly lurk in #lisp@freenode
+(as zkat).
+
+Quick Example
+-------------
+
+This creates a standard object with only =STANDARD-OBJECT= as its parent
+
+        SHEEPLE-USER> (defparameter *my-object* (object))
+        *MY-OBJECT*
+
+We can add properties to an object at any time. This particular call also auto-generates an accessor
+based on the property name given.
+
+        SHEEPLE-USER> (setf (property-value *my-object* 'var :accessor t) "value")
+        #<Object #x1579A04E>
+        SHEEPLE-USER> (var *my-object*)
+        "value"
+
+Creating a new object is as simple as calling OBJECT.
+
+        SHEEPLE-USER> (defparameter *child* (object :parents (list *my-object*)))
+        *CHILD*
+
+Sheeple does differential inheritance by default. This means that value lookup fetches the first
+available value found in the object's precedence list, unless a value is set directly in an object.
+
+        SHEEPLE-USER> (var *child*)
+        "value"
+        SHEEPLE-USER> (setf (var *my-object*) "new-value")
+        "new-value"
+
+We've changed *my-object*'s VAR value, so *child*'s VAR value will also change.
+
+        SHEEPLE-USER> (var *my-object*)
+        "new-value"
+        SHEEPLE-USER> (var *child*)
+        "new-value"
+
+Replies are to Messages as Methods are to Generic Functions, and the semantics are very similar (at
+least on the surface).  Note that Sheeple handles built-in Lisp objects, and can dispatch on
+them. They are named just like the lisp types they refer to, with the =foo= naming scheme for
+prototypes.
+
+        SHEEPLE-USER> (defmessage synergize (a b))
+        #<Message: SYNERGIZE #x157AAC36>
+        SHEEPLE-USER> (defreply synergize ((a =string=) (b =string=)) (concatenate 'string a b))
+        #<Reply: SYNERGIZE #x157D90FE>
+        SHEEPLE-USER> (defreply synergize ((a =number=) (b =number=)) (+ a b))
+        #<Reply: SYNERGIZE #x15815B76>
+        SHEEPLE-USER> (synergize "foo " "bar")
+        "foo bar"
+        SHEEPLE-USER> (synergize 5 5)
+        10
+
+Replies are defined on sheep objects themselves. No need for eql-specialization, everything is an
+'instance' in Sheeple.
+
+        SHEEPLE-USER> (defreply synergize ((a *my-object*) (b *my-object*))
+                        (object :parents (list a b)))
+        #<Reply: SYNERGIZE #x157C5596>
+        SHEEPLE-USER> (synergize *my-object* *child*)
+        ; ERROR - circular precedence graph
+        ; Evaluation aborted.
+        SHEEPLE-USER> (synergize *child* *my-object*)
+        #<Object #x15787456>
+        SHEEPLE-USER> (var (synergize *child* *my-object*))
+        "new-value"
+
+Finally, since objects are fully-dynamic, you can even add and remove parents by simply setting its
+object-parents place:
+
+        SHEEPLE-USER> (defparameter *my-object* (object))
+        *MY-OBJECT*
+        SHEEPLE-USER> (object-parents *my-object*)
+        (#<Object =STANDARD-OBJECT= #x3000413F556D>)
+        SHEEPLE-USER> (push (object :nickname 'some-other-object) (object-parents *my-object*))
+        (#<Object SOME-OTHER-OBJECT #x30004159311D> #<Object =STANDARD-OBJECT= #x3000413F556D>)
+        SHEEPLE-USER> (object-parents *my-object*)
+        (#<Object SOME-OTHER-OBJECT #x30004159311D> #<Object =STANDARD-OBJECT= #x3000413F556D>)
+
+[1]: http://github.com/zkat/sykosomatic/
+[2]: http://github.com/zkat/shepherdb/
+[3]: http://en.wikipedia.org/wiki/CLOS
+[4]: http://slatelanguage.org/
+[5]: http://research.sun.com/self/
+[6]: http://en.wikipedia.org/wiki/Io_(programming_language)
+[7]: http://www.cliki.net/asdf
+[8]: http://common-lisp.net/project/asdf/
+[9]: http://www.cliki.net/Eos
+[10]: http://common-lisp.net/project/sheeple
+[11]: http://sykosomatic.org/sheeple/sheeple.pdf
