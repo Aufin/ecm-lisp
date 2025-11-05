@@ -47,62 +47,48 @@
     "Given a string, produces to a valid JavaScript identifier by
 following transformation heuristics case conversion. For example,
 paren-script becomes parenScript, *some-global* becomes SOMEGLOBAL."
-    (when (and (not (string= identifier "[]"))
-               (find #\[ identifier))
-      (warn 'simple-style-warning
-            :format-control
-            "Parenscript symbol ~A contains a literal array accessor.
-This compound naming convention is deprecated and will be removed!
-Use AREF, ELT, GETPROP, @, or CHAIN instead."
-            :format-arguments (list identifier)))
-    #+(or)(when (find #\. identifier)
-      (warn 'simple-style-warning
-            :format-control
-            "Parenscript symbol ~A contains one or more dot operators.
-This compound naming convention is deprecated and will be removed!
-Use GETPROP, @, or CHAIN instead."
-            :format-arguments (list identifier)))
-    (or
-     (gethash identifier cache)
-     (setf
+	(sb-ext:with-locked-hash-table (cache)
+      (or
        (gethash identifier cache)
-       (cond
+       (setf
+		(gethash identifier cache)
+		(cond
           ((some (lambda (c) (find c "-*+!?#@%/=:<>^")) identifier)
-            (let ((lowercase     t)
-                  (all-uppercase nil))
-              (acond
-                ((nth-value 1
-                   (cl-ppcre:scan-to-strings
-                    "[\\*|\\+](.+)[\\*|\\+](.*)"
-                    identifier :sharedp t))
-                 (setf all-uppercase t
-                       identifier (concatenate
-                                   'string (aref it 0) (aref it 1))))
-                ((and (> (length identifier) 1)
-                      (or (eql (char identifier 0) #\+)
-                          (eql (char identifier 0) #\*)))
-                 (setf lowercase  nil
-                       identifier (subseq identifier 1))))
-              (with-output-to-string (acc)
-                (loop
-                   for c across identifier
-                   do (acond
-                       ((eql c #\-)
-                        (setf lowercase (not lowercase)))
-                       ((position c "!?#@%+*/=:<>^")
-                        (write-sequence
-                         (aref #("bang" "what" "hash" "at" "percent"
-                                 "plus" "star" "slash" "equals" "colon"
-                                 "lessthan" "greaterthan" "caret")
-                               it)
-                         acc))
-                       (t
-                        (write-char
-                         (if (and lowercase (not all-uppercase))
-                             (char-downcase c)
-                             (char-upcase c))
-                         acc)
-                        (setf lowercase t)))))))
+           (let ((lowercase     t)
+                 (all-uppercase nil))
+             (acond
+              ((nth-value 1
+						  (cl-ppcre:scan-to-strings
+						   "[\\*|\\+](.+)[\\*|\\+](.*)"
+						   identifier :sharedp t))
+               (setf all-uppercase t
+                     identifier (concatenate
+                                 'string (aref it 0) (aref it 1))))
+              ((and (> (length identifier) 1)
+                    (or (eql (char identifier 0) #\+)
+                        (eql (char identifier 0) #\*)))
+               (setf lowercase  nil
+                     identifier (subseq identifier 1))))
+             (with-output-to-string (acc)
+               (loop
+					 for c across identifier
+					 do (acond
+						 ((eql c #\-)
+                          (setf lowercase (not lowercase)))
+						 ((position c "!?#@%+*/=:<>^")
+                          (write-sequence
+                           (aref #("bang" "what" "hash" "at" "percent"
+                                   "plus" "star" "slash" "equals" "colon"
+                                   "lessthan" "greaterthan" "caret")
+								 it)
+                           acc))
+						 (t
+                          (write-char
+                           (if (and lowercase (not all-uppercase))
+                               (char-downcase c)
+                               (char-upcase c))
+                           acc)
+                          (setf lowercase t)))))))
           (#.(eql :invert (readtable-case
                            (named-readtables:find-readtable :parenscript)))
              (cond
@@ -113,7 +99,7 @@ Use GETPROP, @, or CHAIN instead."
                        (remove-if-not #'alpha-char-p identifier))
                 (string-upcase identifier))
                (t identifier)))
-          (t identifier))))))
+          (t identifier)))))))
 
 (defun ordered-set-difference (list1 list2 &key (test #'eql))
   "CL set-difference may not preserve order."
