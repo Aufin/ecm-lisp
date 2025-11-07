@@ -45,6 +45,17 @@
 	reverse_proxy * localhost:8080
 }
 
+(ecm-https) {
+	tls /srv/ecm/app/etc/https.pem /srv/ecm/app/etc/https.key
+	import ecm "On Port 443"
+}
+
+gimmy.lan,
+ecm.maxwellclaims.net,
+webinsure.maxwellclaims.net {
+	import ecm-https
+}
+
 :80 {
 	import ecm "on Port 80"
 }
