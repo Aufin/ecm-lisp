@@ -28,8 +28,6 @@
 (defun attachment-filename (attachment)
   (getjso "file_name" attachment))
 
-
-
 (defun claim-attachments (claim-id &key (where nil))
   (mapcar
    #'ecm/json:read-json-from-string
@@ -75,6 +73,13 @@
      :sha1-digest sha1-digest
      :returning (:jsi.claim-attachment 'attachment))))
 
+(defun filename->pathname (filename)
+  (pathname (concatenate
+   'string
+   (loop :for char across filename
+		 :when (char= char #\[) :collect #\\  :end
+		 :collect char))))
+
 (defun attachment-long-pathname (attachment)
   (pathname (concatenate
 	     'string (getjso "sha1_digest" attachment)
@@ -88,14 +93,14 @@
 		  (getjso "file_name" attachment)))))
 
 (defun attachment-short-pathname (attachment)
-  (let ((type (pathname-type (pathname (getjso "file_name" attachment)))))
+  (let ((type (pathname-type (filename->pathname (getjso "file_name" attachment)))))
     (pathname (concatenate
 	       'string (getjso "sha1_digest" attachment)
 	       "." type))))
 
 (defun attachment-relative-pathname (attachment
 				     &key (pathname-function
-					   #'attachment-short-pathname))
+						   #'attachment-short-pathname))
   (merge-pathnames
    (funcall pathname-function attachment)
    (make-pathname
