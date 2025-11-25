@@ -1,1 +1,1 @@
-dists/quicklisp/software/parse-number-v1.7/parse-number.asd
+dists/quicklisp/software/parse-number-v1.8/parse-number.asd

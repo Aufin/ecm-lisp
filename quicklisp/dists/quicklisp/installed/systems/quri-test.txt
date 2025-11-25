@@ -1,1 +1,1 @@
-dists/quicklisp/software/quri-20221106-git/quri-test.asd
+dists/quicklisp/software/quri-20241012-git/quri-test.asd

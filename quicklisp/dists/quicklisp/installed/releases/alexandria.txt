@@ -1,1 +1,1 @@
-dists/quicklisp/software/alexandria-20220707-git/
+dists/quicklisp/software/alexandria-20241012-git/

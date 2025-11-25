@@ -1,1 +1,1 @@
-dists/quicklisp/software/cffi-20230214-git/
+dists/quicklisp/software/cffi-20250622-git/

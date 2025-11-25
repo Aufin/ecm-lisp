@@ -1,0 +1,1 @@
+dists/quicklisp/software/cl-smtp-20241012-git/cl-smtp-tests.asd

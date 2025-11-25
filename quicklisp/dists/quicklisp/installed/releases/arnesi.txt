@@ -1,1 +1,1 @@
-dists/quicklisp/software/arnesi-20170403-git/
+dists/quicklisp/software/arnesi-20250622-git/

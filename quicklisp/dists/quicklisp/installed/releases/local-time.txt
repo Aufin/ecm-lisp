@@ -1,1 +1,1 @@
-dists/quicklisp/software/local-time-20230214-git/
+dists/quicklisp/software/local-time-20250622-git/

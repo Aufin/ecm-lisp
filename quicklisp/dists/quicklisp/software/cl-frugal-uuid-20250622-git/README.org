@@ -1,0 +1,434 @@
+* cl-frugal-uuid
+
+#+begin_html
+<div align="center">
+  <a href="https://upload.wikimedia.org/wikipedia/commons/5/5f/NASA_satellite_view_of_Southern_Ocean_phytoplankton_bloom_%28crop%29.jpg" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/NASA_satellite_view_of_Southern_Ocean_phytoplankton_bloom_%28crop%29.jpg/320px-NASA_satellite_view_of_Southern_Ocean_phytoplankton_bloom_%28crop%29.jpg" width="220" height="157">
+  </a>
+</div>
+<p align="center">
+  <a href="https://github.com/ak-coram/cl-frugal-uuid/actions">
+    <img alt="Build Status" src="https://github.com/ak-coram/cl-frugal-uuid/workflows/CI/badge.svg" />
+  </a>
+</p>
+#+end_html
+
+Common Lisp [[https://en.wikipedia.org/wiki/Universally_unique_identifier][UUID]] library with zero dependencies
+
+** Rationale
+
+- Permissive license (MIT)
+- Small (e.g. doesn't rely on [[https://github.com/sharplispers/ironclad][Ironclad]] by default)
+- Comprehensive (e.g. tries to cover new versions from [[https://www.rfc-editor.org/rfc/rfc9562][RFC 9562]])
+
+** Limitations
+
+Please note that by default the implementation dependent built-in CL
+random number generator is used, which might not be of sufficient
+quality for your purposes. The use of cryptographic-quality random
+numbers is strongly recommended in order to reduce the probability of
+repeated values. Please see the section on randomness in this README
+for setting up an alternative source of random numbers especially for
+generating UUID versions 4 and 7.
+
+You can also use the [[https://github.com/ak-coram/cl-frugal-uuid#non-frugal-setup][frugal-uuid/non-frugal]] system to change the
+defaults and provide support for generating name-based UUIDs (versions
+3 and 5). This should only be necessary if you intend to securely
+generate new UUIDs via this library: for representing existing UUIDs
+(parsing, comparing and converting values) relying on the frugal-uuid
+system should be sufficient.
+
+Please also see [[https://github.com/ak-coram/cl-frugal-uuid#Saving-a-Lisp-image][this section]] of the README if you intend on saving
+your program as a Lisp image.
+
+The following implementations and operating systems are tested via [[https://github.com/ak-coram/cl-frugal-uuid/blob/main/.github/workflows/CI.yml][CI]]:
+
+- [[https://sbcl.org/][SBCL]] (Linux, Windows, macOS)
+- [[https://ccl.clozure.com/][CCL]] (Linux)
+- [[https://ecl.common-lisp.dev/][ECL]] (Linux, macOS)
+
+** Installation
+
+cl-frugal-uuid can be installed via [[https://www.quicklisp.org/][Quicklisp]]:
+
+#+begin_src lisp
+  (ql:quickload :frugal-uuid)
+#+end_src
+
+The latest version is available from the [[https://ultralisp.org/][Ultralisp]] distribution:
+
+#+begin_src lisp
+  (ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)
+  (ql:quickload :frugal-uuid)
+#+end_src
+
+Alternatively you can also rely on [[https://github.com/ocicl/ocicl][ocicl]].
+
+** Basic usage
+
+#+begin_src lisp
+  ;; Generate version 1 UUID
+  (fuuid:make-v1) ; => #<FRUGAL-UUID:UUID 58c3e000-1875-100c-a524-89154ef00c1c>
+
+  ;; Generate random UUID
+  (fuuid:make-v4) ; => #<FRUGAL-UUID:UUID 3ffc05ba-9c35-4f21-8535-beba03a2495c>
+
+  ;; Convert random UUID to canonical string representation
+  (fuuid:to-string (fuuid:make-v4)) ; => "2172e412-06a6-4cfb-bbf1-3584aadaed15"
+
+  ;; Parse UUID from string
+  (fuuid:from-string "0909e4f4-8333-4712-8609-5ae02d735772")
+  ;; => #<FRUGAL-UUID:UUID 0909e4f4-8333-4712-8609-5ae02d735772>
+
+  ;; Convert UUID to octets
+  (fuuid:to-octets (fuuid:make-v4))
+  ;; => #(33 194 68 252 59 137 78 19 177 22 25 166 226 241 44 55)
+
+  ;; Compare two random UUID values
+  (fuuid:uuid= (fuuid:make-v4) (fuuid:make-v4)) ; => NIL
+
+  ;; Loosely compare UUID with canonical string representation
+  (fuuid:uuid-equal-p
+   (fuuid:from-string "0909e4f4-8333-4712-8609-5ae02d735772")
+   "0909e4f4-8333-4712-8609-5ae02d735772") ; => T
+#+end_src
+
+** Embedding UUIDs
+
+You can efficiently embed UUID literals in your source using the ~
+macro:
+
+#+begin_src lisp
+  (fuuid:~ 1d2f8148-c30c-4f9d-8aae-2ac5807000dc)
+  ;; => #<FRUGAL-UUID:UUID 1d2f8148-c30c-4f9d-8aae-2ac5807000dc>
+
+  (multiple-value-list (fuuid:~ 1d2f8148-c30c-4f9d-8aae-2ac5807000dc
+                                fa23520b-972c-4f84-b5bf-91f0d7d4f4b4))
+  ;; => (#<FRUGAL-UUID:UUID 1d2f8148-c30c-4f9d-8aae-2ac5807000dc>
+  ;;     #<FRUGAL-UUID:UUID fa23520b-972c-4f84-b5bf-91f0d7d4f4b4>)
+
+  ;; When called without arguments, the macro generates a random
+  ;; value during expansion (via MAKE-V4):
+  (fuuid:~)
+  ;; => #<FRUGAL-UUID:UUID f890220f-0a9d-4380-80ce-f88d59619480>
+#+end_src
+
+For writing your own macros, you can rely on the COMPILE-LITERAL
+function.
+
+** non-frugal setup
+
+#+begin_src lisp
+  (ql:quickload :frugal-uuid/non-frugal)
+#+end_src
+
+The above system is provided to conveniently setup the following:
+
+- Use Ironclad PRNG to generate [[https://github.com/ak-coram/cl-frugal-uuid/blob/main/non-frugal/strong-random.lisp][strong random numbers]].
+- Use [[https://github.com/ak-coram/cl-trivial-clock][cl-trivial-clock]] to generate more accurate timestamps by relying
+  on platform-specific functionality.
+- Automatically use a new PRNG and randomize node ID & clock sequence
+  for generating version 1 and version 7 UUIDs for each new thread
+  (via [[https://github.com/ak-coram/cl-frugal-uuid/blob/main/non-frugal/thread-safe.lisp][bordeaux-threads]]).
+- Define the [[https://github.com/ak-coram/cl-frugal-uuid/blob/main/non-frugal/name-based.lisp][MAKE-V3 and MAKE-V5 functions]] relying on the babel and
+  Ironclad libraries for hashing.
+
+frugal-uuid/non-frugal is composed of multiple systems which can also
+be loaded individually if you only require parts of the above. See
+[[https://github.com/ak-coram/cl-frugal-uuid/blob/main/frugal-uuid.asd][frugal-uuid.asd]] for details.
+
+** UUID Versions
+
+*** Version 1
+
+Node ID and clock sequence are initialized randomly by default, but
+you can provide your own values (or even your own function for
+generating timestamp values) using MAKE-V1-GENERATOR. Currently
+there's no mechanism included in this library for determining the
+systems MAC address, but the PARSE-NODE-ID function is included for
+parsing it once obtained.
+
+The clock sequence is reinitialized on every new clock tick with the
+highest bit set to zero and a random value for the remaining bits.
+
+To avoid repeated values, it is recommended for multithreaded
+applications to use a separate generator for each thread. This is
+automatically done using bordeaux-threads if you use the
+frugal-uuid/non-frugal system.
+
+Please also see the section on randomness for setting up alternative
+sources for random numbers.
+
+#+begin_src lisp
+  (bordeaux-threads-2:make-thread
+   (lambda ()
+     (format t "~A" (fuuid:make-v1)))
+   :initial-bindings `((fuuid:*v1-generator* . ,(fuuid:make-v1-generator))))
+#+end_src
+
+*** Version 2
+
+Generating "DCE security" UUIDs (version 2) is not implemented.
+
+*** Version 3
+
+See section for version 5 below.
+
+*** Version 4
+
+#+begin_src lisp
+  ;; Generate random UUID
+  (fuuid:make-v4)
+
+  ;; Provide 128-bit random number directly and set the bits for version 4
+  (fuuid:make-v4-from-integer
+   (secure-random:number #xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+#+end_src
+
+*** Version 5
+
+If you're using the frugal-uuid/non-frugal system, then you can also
+generate name-based (version 3 or version 5) UUIDs:
+
+#+begin_src lisp
+  (fuuid:make-v3 fuuid:*ns-url* "https://html5zombo.com/")
+  ;; => #<FRUGAL-UUID:UUID a76f94c8-b970-33d8-bac6-84f18fbbc489>
+
+  (let ((cheese-namespace (fuuid:make-v4)))
+    (fuuid:make-v5 cheese-namespace "Orda"))
+  ;; => #<FRUGAL-UUID:UUID dd4d48d9-d46b-58a0-977e-e9e5e20a6e9c>
+#+end_src
+
+*** Version 6
+
+The implementation first generates a version 1 UUID (see above) and
+reorders the timestamp fields to create a version 6 UUID value. Please
+note that the slot accessors for the UUID class (TIME-LOW, TIME-MID
+and TIME-HI-AND-VERSION) are based on RFC 4122 and do not match the
+timestamp part names used for version 6. Please rely on the following
+functions instead:
+
+- V6-TIME-LOW-AND-VERSION
+- V6-TIME-MID
+- V6-TIME-HIGH
+
+#+begin_src lisp
+  (fuuid:make-v6)
+  ;; => #<FRUGAL-UUID:UUID 1ee2d53a-729c-6929-8c8c-e780ff7b0e6a>
+#+end_src
+
+*** Version 7
+
+When an accurate system clock is available (see
+frugal-uuid/non-frugal):
+
+- 48 bit unsigned unix timestamp (milliseconds)
+- 12 bits for storing sub-millisecond precision
+- 62 bit monotonic random counter
+
+This approach is a combination of methods 2 and 3 from the
+specification for providing monotonicity.
+
+When no accurate clock is available:
+
+- 48 bit unsigned unix timestamp (also stored as a number of
+  milliseconds, but only updates every second)
+- 74 bit monotonic random counter
+
+This corresponds to method 2 from the specification for providing
+monotonicity.
+
+Regarding the monotonic random counter:
+
+- Is randomly reinitialized on every clock tick (or when the system
+  clock is changed backwards) while generating successive UUID
+  values. The highest 2 bits are always set to zero to minimize
+  rollover.
+- Is incremented when successive UUID values are generated for the
+  same timestamp (which includes the sub-millisecond bits for accurate
+  clocks). The increment is a 16-bit random number to make values less
+  guessable.
+
+#+begin_src lisp
+  (fuuid:make-v7)
+  ;; => #<UUID 0189a085-b115-7e5d-8664-3c5fbe542e4c>
+#+end_src
+
+*** Version 8
+
+The MAKE-V8 function is provided to create version 8 UUID values from
+specifying the three custom components:
+
+- custom_a (48 bits)
+- custom_b (12 bits)
+- custom_c (62 bits)
+
+**** MiNaRa UUID (custom UUID relying on version 8)
+
+The frugal-uuid/non-frugal system provides a custom UUID generation
+scheme which encodes a nanosecond precision timestamp in a version 8
+UUID and randomizes the remaining variable bits. It consists of three
+components which also make up the name:
+
+- *Mi*-lliseconds elapsed since the unix epoch (48-bit unsigned value,
+  identical to timestamp in UUID version 7)
+- Additional *Na*-noseconds (20-bit unsigned value, not greater
+  than 999999)
+- *Ra*-ndom data (remaining 54 bits)
+
+The random component may also be used for encoding custom data.
+
+#+begin_src lisp
+  (fuuid:make-minara)
+  ;; => #<FRUGAL-UUID:UUID 01899a63-6540-8d89-b9db-f0fa388bf86e>
+
+  (fuuid:minara-components *)
+  ;; => 1690512352576 (41 bits, #x1899A636540)
+  ;;    887271 (20 bits, #xD89E7)
+  ;;    7864781852375150 (53 bits, #x1BF0FA388BF86E)
+
+  (fuuid:minara-components (fuuid:make-minara 42))
+  ;; => 1690514402692 (41 bits, #x1899A82AD84)
+  ;;    507614 (19 bits, #x7BEDE)
+  ;;    42 (6 bits, #x2A, #o52, #b101010)
+#+end_src
+
+** Timestamps
+
+The Common Lisp standard only provides a function to retrieve the
+current wall-clock time as a number of whole seconds elapsed since the
+Common Lisp epoch. In order to make use of the subsecond bits of the
+timestamp (in UUID versions 1, 6 and 7), the default implementation
+uses them as a counter which is incremented every time the clock
+sequence values are exhausted within the same clock tick. If the total
+number of unique values is exhausted, the counter wraps around and
+starts at zero again.
+
+Within the frugal-uuid/non-frugal system a more accurate clock is
+available and the above doesn't apply.
+
+** Randomness
+
+If you have an alternative source of random numbers, you can use it
+instead of the built-in random number generator. Please consult the
+documentation of your chosen implementation or library for details on
+thread-safety if you intend to use this in a multi-threaded program.
+
+*** Ironclad
+
+A setup using [[https://github.com/sharplispers/ironclad#pseudo-random-number-generation][Ironclad PRNG]]:
+
+#+begin_src lisp
+  (ql:quickload :ironclad/prngs)
+
+  ;; Use the default Ironclad PRNG:
+  (fuuid:initialize-random #'crypto:strong-random)
+
+  ;; Setup with custom PRNG:
+  (fuuid:initialize-random #'crypto:strong-random
+                           (lambda () (ironclad:make-prng :os)))
+
+  ;; Dynamically bind the generator:
+  (fuuid:with-random-number-generator (ironclad:make-prng :os)
+    (fuuid:make-v4))
+#+end_src
+
+*** secure-random
+
+Below you'll find and example using the [[https://github.com/avodonosov/secure-random][secure-random]] library which
+relies on OpenSSL:
+
+#+begin_src lisp
+  ;; Load library for generating secure random numbers
+  (ql:quickload :secure-random)
+
+  ;; Dynamically bind both random number generator & random function:
+  (fuuid:with-random (#'secure-random:number secure-random:*generator*)
+    (fuuid:make-v4))
+#+end_src
+
+*** Saving a Lisp image
+
+If you generate UUID values while building your Lisp image, it can
+include global random state which already has been initialized. This
+would mean that executing the image multiple times could lead to
+generating repeated UUID values.
+
+To avoid this, you can clear the global state before saving your image
+or on image startup (it will be reinitialized on first use):
+
+#+begin_src lisp
+    (setf fuuid:*random-number-generator* nil
+          fuuid:*v1-generator* nil
+          fuuid:*v7-generator* nil)
+#+end_src
+
+If you only load the systems in this project this should not be an
+issue as the global random state is initialized on first use (when
+generating UUID values of either version 1 or version 4).
+
+Here's an example session illustrating the issue:
+
+#+begin_src
+  $ sbcl
+
+  * (ql:quickload :frugal-uuid)
+  To load "frugal-uuid":
+    Load 1 ASDF system:
+      frugal-uuid
+  ; Loading "frugal-uuid"
+  (:FRUGAL-UUID)
+
+  * (fuuid:make-v4)
+  #<FRUGAL-UUID:UUID 88d17bef-3541-4660-b7fe-ecc588778311>
+
+  * (ql:quickload :trivial-dump-core)
+  To load "trivial-dump-core":
+    Load 1 ASDF system:
+      trivial-dump-core
+  ; Loading "trivial-dump-core"
+
+  (:TRIVIAL-DUMP-CORE)
+
+  * (trivial-dump-core:save-executable
+     "echo-random-uuid"
+     (lambda () (format t "~a~%" (fuuid:to-string (fuuid:make-v4)))))
+  [undoing binding stack and other enclosing state... done]
+  [performing final GC... done]
+  [defragmenting immobile space... (inst,fdefn,code,sym)=959+18456+19452+26866... done]
+  [saving current Lisp image into echo-random-uuid:
+  writing 3376 bytes from the static space at 0x50000000
+  writing 21266432 bytes from the dynamic space at 0x1000000000
+  writing 7443312 bytes from the read-only space at 0xfff8e0000
+  writing 2015232 bytes from the fixedobj space at 0x50100000
+  writing 11993088 bytes from the text space at 0x52a00000
+  done]
+
+  $ ./echo-random-uuid
+  cb09eb20-64c6-4ed0-b5be-c89388a673fe
+  $ ./echo-random-uuid
+  cb09eb20-64c6-4ed0-b5be-c89388a673fe
+#+end_src
+
+** Running tests
+
+- Load the tests via Quicklisp:
+
+#+begin_src lisp
+  (ql:quickload :frugal-uuid/test)
+#+end_src
+
+- Use [[https://asdf.common-lisp.dev/][ASDF]] or [[https://fiveam.common-lisp.dev/][FiveAM]] to run the tests:
+
+#+begin_src lisp
+  ;; Using ASDF:
+  (asdf:test-system :frugal-uuid)
+  ;; Using FiveAM directly:
+  (fiveam:run! :frugal-uuid)
+#+end_src
+
+** Legal
+
+- Released under the MIT License.
+- [[https://developercertificate.org/][Developer Certificate of Origin]]
+- [[https://commons.wikimedia.org/wiki/File:NASA_satellite_view_of_Southern_Ocean_phytoplankton_bloom_(crop).jpg][Source]] for README photo

@@ -1,1 +1,1 @@
-dists/quicklisp/software/cl-unicode-20210228-git/
+dists/quicklisp/software/cl-unicode-20241012-git/

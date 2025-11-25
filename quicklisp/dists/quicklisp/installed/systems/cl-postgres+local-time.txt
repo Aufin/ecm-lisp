@@ -1,1 +1,1 @@
-dists/quicklisp/software/local-time-20230214-git/cl-postgres+local-time.asd
+dists/quicklisp/software/local-time-20250622-git/cl-postgres+local-time.asd

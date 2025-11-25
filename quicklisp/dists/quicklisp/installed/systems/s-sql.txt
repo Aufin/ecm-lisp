@@ -1,1 +1,1 @@
-dists/quicklisp/software/postmodern-20230214-git/s-sql.asd
+dists/quicklisp/software/postmodern-20241012-git/s-sql.asd

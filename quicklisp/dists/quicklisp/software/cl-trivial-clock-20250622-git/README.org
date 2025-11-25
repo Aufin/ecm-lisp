@@ -1,0 +1,89 @@
+* cl-trivial-clock
+
+#+begin_html
+<div align="center">
+  <a href="https://upload.wikimedia.org/wikipedia/commons/7/76/Al-jazari_elephant_clock.png" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Al-jazari_elephant_clock.png/382px-Al-jazari_elephant_clock.png" width="264" height="414">
+  </a>
+</div>
+<p align="center">
+  <a href="https://github.com/ak-coram/cl-trivial-clock/actions">
+    <img alt="Build Status" src="https://github.com/ak-coram/cl-trivial-clock/workflows/CI/badge.svg" />
+  </a>
+</p>
+#+end_html
+
+Common Lisp library to get accurate wall-clock times on multiple platforms
+
+** Overview
+
+CL:GET-UNIVERSAL-TIME is limited to returning whole seconds, but some
+platforms can provide more accurate clocks. This library aims to wrap
+platform-specific system calls for this purpose and fall back on
+CL:GET-UNIVERSAL-TIME on any unsupported platform.
+
+Currently the [[https://man.archlinux.org/man/clock_gettime.2.en][clock_gettime]] call is used (with CLOCK_REALTIME) on all
+Unix systems and [[https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimepreciseasfiletime][GetSystemTimePreciseAsFileTime]] on Windows, except for
+Windows versions below version 8 where [[https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimeasfiletime][GetSystemTimeAsFileTime]] is
+used.
+
+The following software combinations are tested via GitHub actions on
+x86-64:
+
+- [[https://sbcl.org/][SBCL]] (Linux, Windows, macOS, OpenBSD, FreeBSD, DragonflyBSD)
+- [[https://ccl.clozure.com/][CCL]] (Linux)
+- [[https://ecl.common-lisp.dev/][ECL]] (Linux, macOS, OpenBSD, FreeBSD)
+
+** Installation
+
+cl-trivial-clock can be installed via [[https://www.quicklisp.org/][Quicklisp]]:
+
+#+begin_src lisp
+  (ql:quickload :trivial-clock)
+#+end_src
+
+The latest version is available from the [[https://ultralisp.org/][Ultralisp]] distribution:
+
+#+begin_src lisp
+  ;; Install the ultralisp distribution if you don't have it already
+  (ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)
+  ;; Load cl-trivial-clock
+  (ql:quickload :trivial-clock)
+#+end_src
+
+Alternatively you can also rely on [[https://github.com/ocicl/ocicl][ocicl]].
+
+** Usage
+
+The function NOW returns the number of seconds since the unix epoch
+and the number of additional nanoseconds as a second value:
+
+#+begin_src lisp
+  ;; Get current wall-clock time:
+  (trivial-clock:now)
+  ;; => 1688533183 (31 bits, #x64A4F8BF)
+  ;;    529460903 (29 bits, #x1F8EEEA7)
+#+end_src
+
+*** Running tests
+
+- Load the tests via Quicklisp:
+
+#+begin_src lisp
+  (ql:quickload :trivial-clock/test)
+#+end_src
+
+- Use [[https://asdf.common-lisp.dev/][ASDF]] or [[https://fiveam.common-lisp.dev/][FiveAM]] to run the tests:
+
+#+begin_src lisp
+  ;; Using ASDF:
+  (asdf:test-system :trivial-clock)
+  ;; Using FiveAM directly:
+  (fiveam:run! :trivial-clock)
+#+end_src
+
+** Legal
+
+- Released under the MIT License
+- [[https://developercertificate.org/][Developer Certificate of Origin]]
+- [[https://en.wikipedia.org/wiki/File:Al-jazari_elephant_clock.png][Source]] for README photo

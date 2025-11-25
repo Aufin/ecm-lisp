@@ -1,1 +1,1 @@
-dists/quicklisp/software/uax-15-20221106-git/
+dists/quicklisp/software/uax-15-20241012-git/
