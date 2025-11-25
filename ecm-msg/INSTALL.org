@@ -1,0 +1,7 @@
+#+TITLE: Installation of `ecm-msg`
+
+
+#+begin_src sh
+  git clone --depth=1 https://github.com/drewc/ecm-msg.git && \
+  cd ecm-msg && npm install
+#+end_src
