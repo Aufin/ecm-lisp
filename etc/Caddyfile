@@ -22,13 +22,45 @@
 	# The login: from old to new
 
 	redir /ecm/login* /login/
-	redir / /ecm/index
-	redir /ecm/diary* /diary/
+    redir /ecm/diary* /diary/
 
-	handle_path /diary/* {
-		reverse_proxy localhost:8080
+    # The handle path is for the middle SPA so everything from root
+
+    handle_path /diary/* {
+        reverse_proxy localhost:8080
+    }
+    handle_path /bordereau/* {
+	  	reverse_proxy localhost:8080
+	}
+    handle_path /contract/* {
+	  	reverse_proxy localhost:8080
+    }
+    handle_path /manage/* {
+	  	reverse_proxy localhost:8080
+	}
+    handle_path /movement/* {
+	  	reverse_proxy localhost:8080
+	}
+    handle_path /time-recorded/* {
+	  	reverse_proxy localhost:8080
+    }
+    handle_path /query/* {
+	  	reverse_proxy localhost:8080
+	}
+    handle_path /person/* {
+	  	reverse_proxy localhost:8080
+	}
+    handle_path /staging* {
+	  	reverse_proxy localhost:8080
 	}
 
+
+    # It is mutually exclusive to other rewrite directives in the same
+    # block, so it is safe to define rewrites that would otherwise
+    # cascade into each other as only the first matching rewrite will
+    # be executed.
+
+    rewrite /rpc/*.ss {uri}
 	rewrite /rpc/* {uri}.ss
 
 	# The old SPA has a bunch
@@ -38,7 +70,10 @@
 	rewrite @reportsub /old-spa/dist{uri}
 	rewrite @reportdom /old-spa/dist/index.html
 
-	rewrite /assets/* /old-spa/dist{uri}
+    rewrite /assets/* /old-spa/dist{uri}
+
+
+	redir / /ecm/index
 
 	# reverse_proxy /ecm/login* localhost:8080
 	reverse_proxy /ecm/* localhost:4242
