@@ -61,3 +61,57 @@ export const msgBodyHtml = async (msg) => {
   // console.log('have imgs', imgs.map(i => i.getAttribute('src')));
   return doc.outerHTML;
 }
+
+export const msgHeadersHtml = (msg) => {
+	const data = msg.getFileData(),
+		  { senderName, senderEmail, inetAcctName,
+			senderAddressType,
+			subject, recipients,
+			messageDeliveryTime,
+			lastModificationTime
+		  } = data,
+		  getSenderEmail = () => {
+			  if (senderAddressType == "EX" ||
+				  senderEmail.toLowerCase().startsWith('/o=')) {
+				  return inetAcctName
+			  }
+			  return senderEmail
+		  },
+		  getToCc = () => {
+			  return recipients.map(r => {
+				  return `<b>${r.name}</b> &lt;${r.smtpAddress}&gt;`			  }).join(', ')
+
+		  }
+								   
+			  
+
+	return `<table>
+ <tr>
+     <td>Subject:</td>
+     <td><b>${subject}</b></td>
+  </tr>
+ <tr>
+     <td>From:</td>
+     <td><b>${senderName}</b> &lt;${getSenderEmail()}&gt;</td>
+  </tr>
+ <tr>
+     <td>To/cc:</td>
+     <td>${getToCc()}</td>
+  </tr>
+ <tr>
+     <td>Date:</td>
+     <td><i>${messageDeliveryTime || lastModificationTime}</i></td>
+  </tr>
+  </table>
+`
+}
+
+export const msgToHtml = async (msg) => {
+	const head = msgHeadersHtml(msg),
+		  body = await msgBodyHtml(msg)
+	return `${head}
+  <hr><br>
+ ${body}` 
+}
+	
+	

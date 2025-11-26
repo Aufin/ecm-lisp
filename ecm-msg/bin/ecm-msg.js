@@ -14,7 +14,8 @@ import { msgInternalHtml,
          msgInternalDoc,
          msgDocInlineImgs,
          inlineCidImg,
-         msgBodyHtml
+         msgBodyHtml,
+         msgToHtml
        } from '../lib/html.js'
 
 
@@ -24,7 +25,7 @@ program
   .action(async (msgFilePath, saveToHtmlFilePath) => {
     const msgFileBuffer = fs.readFileSync(msgFilePath)
     const msg = new MsgReader(msgFileBuffer)
-    const html = await msgBodyHtml(msg);
+    const html = await msgToHtml(msg);
    console.log(html)
   });
 
