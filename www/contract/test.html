@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+  	<title>Test ECM Contracts</title>
+  	<link rel="stylesheet" href="../base.css">
+    </head>
+    <body>
+      <script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const autoEl = document.querySelector('[data-auto]'),
+				  auto = new Base.view.SelectContract({
+					  el: autoEl,
+					  description: { label : "Contract" }}),
+				  allContracts = new Base.collection.Contracts();
+			
+			allContracts.load()
+				.then(_ => {
+					const n = Math.floor(Math.random() * allContracts.length),
+						  model = allContracts.at(n),
+						  el = document.querySelector('[data-inline]'),
+						  inline = new Base.view.InlineContract({ el, model })
+
+					console.info('Inline:', inline)
+				})
+					
+
+					
+		})
+	  </script>
+
+	  <h1> Contracts!</h1> <br>
+      <div class="row">
+		<div class="col s12">
+		  <div class="row">
+			<div data-auto class="input-field col s12">
+			  <i class="material-icons prefix">textsms</i>
+			  <input type="text" id="autocomplete-input" class="autocomplete">
+			  <label for="autocomplete-input">Contract</label>
+			</div>
+		  </div>
+		</div>
+	  </div>
+
+	  <div data-inline></div>
+  	  <script src="../base.js" charset="UTF-8"></script>
+    </body>
+  </html>

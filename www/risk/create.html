@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+  	<title>ECM: Create Risk</title>
+  	<link rel="stylesheet" href="../base.css">
+    </head>
+    <body>
+	  <nav class="nav navbar">
+		<div class="nav-wrapper">
+		  <a href="/ecm/index" style="color: var(--md-sys-color-on-background); padding: 0 10px;" class="brand-logo">ECM</a>
+		</div>
+</nav>
+
+	  <h1 class="center-align">Create Risk</h1> <br>
+	  <div data-spinal="EditRisk({ model: new Risk()}"></div>
+  	  <script src="../base.js" charset="UTF-8"></script>
+	  <script>
+		document.addEventListener('DOMContentLoaded', function() {
+		 const Risk = Base.model.Risk,
+		       env = _.create(Base.view, { Risk })
+		
+		 Base.S.autoInit({env})
+		})
+  </script>
+
+   </body>
+  </html>

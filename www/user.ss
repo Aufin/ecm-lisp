@@ -63,23 +63,19 @@
 		  
      (if (not db-pool)
        (http-response-write
-	res 301
-	'(("Location" . "/ecm/login")
-	  ("Cache-Control" . "no-cache"))
-	"")
-     (parameterize ((current-db-conpool db-pool)
-		    (current-db-conpool-constructor make-db-pool))
-       (handler req res)))
-
-     
+		res 301
+		'(("Location" . "/ecm/login")
+		  ("Cache-Control" . "no-cache"))
+		"")
+       (parameterize ((current-db-conpool db-pool)
+					  (current-db-conpool-constructor make-db-pool))
+		 (handler req res)))
      (catch (e)
-       (displayln e)
        (http-response-write
-	res 500 '(("Content-Type" . "text/plain"))
-	
-	(format "ERROR HERE?: ~a"
-		(if (RuntimeException? e) "RuntimeException" e)))
-	(raise e)))))
+		res 500 '(("Content-Type" . "text/plain"))
+		(if (RuntimeException? e)
+		  "RuntimeException"
+		  (error-message e)))))))
    		   
 
   

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+  	<title>Test ECM Policy</title>
+  	<link rel="stylesheet" href="../base.css">
+    </head>
+    <body>
+      <script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const autoEl = document.querySelector('[data-auto]'),
+				  Policies = new Base.collection.Policies(),
+				  auto = new Base.view.SelectPolicy({
+					  el: autoEl,
+					  // collection: Policies,
+					  description: { label : "Policy" }})
+
+			// Policies.search('', 42).then(p =>  {
+			// 	console.log('search and got results', p)
+			// 	auto.setMenuFromCollection()
+			// })
+
+			// globalThis.Policies = Policies
+
+			
+
+		
+			
+					
+
+					
+		})
+	  </script>
+
+	  <h1> Policy Test</h1> <br>
+      <div class="row">
+		<div class="col s12">
+		  <div class="row">
+			<div data-auto class="input-field col s12">
+			  <i class="material-icons prefix">textsms</i>
+			  <input type="text" id="autocomplete-input" class="autocomplete">
+			  <label for="autocomplete-input">Contract</label>
+			</div>
+		  </div>
+		</div>
+	  </div>
+
+	  <div data-inline></div>
+  	  <script src="../base.js" charset="UTF-8"></script>
+    </body>
+  </html>

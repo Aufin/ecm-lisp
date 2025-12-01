@@ -9,7 +9,7 @@
 #;(begin
   (import :std/actor)
   (set-default-reply-timeout! 600))
-
+;; (reload "user")
 (reload "/srv/ecm/app/www/db.ss")
 (reload "/srv/ecm/app/www/req.ss")
 (reload "/srv/ecm/app/www/user.ss")
@@ -55,7 +55,7 @@
 
      (http-response-write
       res 200 '(("Content-Type" . "text/plain"))
-      (format "Pool? ~a \n Conf db  ~a ~a ~a ~a \n\n~a"
+      (format "Does thsis worK \n Pool? ~a \n Conf db  ~a ~a ~a ~a \n\n~a"
 	      (http-request->db-conpool req)
 	      (conf-value ["database" "master" "host"] #f)
 	      #;gerbil/tools/gxhttpd#main

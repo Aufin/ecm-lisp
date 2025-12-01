@@ -72,6 +72,11 @@
 
     rewrite /assets/* /old-spa/dist{uri}
 
+    @create_risk query create[type]=risk
+
+    rewrite @create_risk /risk/create.html
+
+
 
 	# redir / /ecm/index
 

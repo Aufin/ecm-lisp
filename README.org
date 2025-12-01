@@ -1,0 +1,10 @@
+#+TITLE: The ECM application
+
+The Electronic Claims Manager is based around [[https://github.com/Aufin/ecm-database][a database]], and older
+Common Lisp application (deprecated), and this repo.
+
+* The GUI
+
+
+
+

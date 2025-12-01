@@ -53,6 +53,7 @@
 (def current-db-conpool (make-parameter ecm-conpool))
 (def current-db-conpool-constructor (make-parameter make-pgpool))
 
+
 (def (ecm-sql sql-fn . args)
   (def current-pool (current-db-conpool))
 
@@ -81,6 +82,8 @@
       (if err
 	(raise err)
 	(conpool-put pool conn))))))
+
+(def (esql q . args) (apply ecm-sql sql-eval-query q args))
 
 (def (json-object<-sql-eval-query db query . args)
   (def stmt (sql-prepare db query))
