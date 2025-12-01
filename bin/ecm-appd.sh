@@ -11,31 +11,6 @@ mkdir -p $VARLOG
 CMD_HELP () {
 	echo "Commands: status, help, shell, quit, exit"
 }
-
-RUNTIME_FILE=`mktemp`
-
-now () {
-   cat /proc/uptime | cut -d' ' -f1 | cut -d. -f1
-}
-make-runtime-file () {
-   start_time=`now`
-  echo $start_time > $RUNTIME_FILE
-}
-
-check-runtime-file () {
-  [ -s $RUNTIME_FILE ]
-}
-
-check-runtime () {
-	if check-runtime-file ; then
-	 start=`cat $RUNTIME_FILE`
-	 runtime=`now`
-	 [ $runtime -ge $start ]
-	else
-		false
-	fi
-}
-
 	
 # First, the gerbil httpd
 
@@ -51,12 +26,8 @@ httpd-pid () {
 }
 
 check-httpd () {
-	if check-runtime; then
-		PID=`httpd-pid`
-		[ -n $PID ] && kill -0 ${PID}
-	else
-		false
-	fi
+	PID=`httpd-pid`
+	[ -n $PID ] && kill -0 ${PID}
 }
 
 ensure-httpd () {
@@ -77,6 +48,7 @@ run-lisp () {
     mkdir -p `dirname $LISP_LOG`
     mkdir -p `dirname $LISP_PIDF`
     [ -s "$LISP_SOCK" ] && rm "$LISP_SOCK"
+    [ -s "$LISP_PIDF" ] && rm "$LISP_PIDF"
     detachtty --dribble-file "$LISP_DRIBBLE" --log-file "$LISP_LOG" \
 	       --pid-file "$LISP_PIDF" "$LISP_SOCK" /usr/local/bin/ecm-application
 }
@@ -87,7 +59,7 @@ lisp-pid () {
 
 check-lisp () {
     PID=`lisp-pid`
-    check-runtime && [ -n $PID ] && kill -0 ${PID} #
+    [ -n $PID ] && kill -0 ${PID} 
 }
 
 ensure-lisp () {
@@ -113,7 +85,7 @@ caddy-pid () {
 
 check-caddy () {
     PID=`caddy-pid`
-    check-runtime && [ -n $PID ] && kill -0 ${PID} # > /dev/null &2>1
+    [ -n $PID ] && kill -0 ${PID} 
 }
 
 ensure-caddy () {
@@ -142,13 +114,16 @@ show-status () {
 	lisp_pid=`lisp-pid`
 	echo "Lisp is running: $lisp_pid"
     else
-	echo "Lisp is not running. Try the 'run lisp' command"
+	echo "Lisp is not running. Try the `$0 run-lisp` command"
     fi
 
-    check-runtime-file
-    echo check runtime file: $?
-   #  check-runtime
-#     echo check runtime: $?
+	if check-caddy; then
+	caddy_pid=`caddy-pid`
+	echo "Caddy is running: $caddy_pid"
+    else
+	echo "Caddy is not running. Try the `$0 run-caddy` command"
+    fi
+
 
 }
 
@@ -178,6 +153,9 @@ dispatch () {
 		shell)
 			sh
 			;;
+		run-lisp)
+			run-lisp
+			;;
  		mux)
 			mux $@
 			;;
@@ -202,19 +180,23 @@ mux () {
 }
 
 start () {
-mkdir -p "${VARRUN}"
-  ensure-httpd > /dev/null &2>1
-  ensure-lisp > /dev/null &2>1
-  ensure-caddy > /dev/null &2>1
-  check-runtime-file || make-runtime-file
+  mkdir -p "${VARRUN}"
+  ensure-httpd > /dev/null 2>&1
+  ensure-lisp > /dev/null 2>&1
+  ensure-caddy > /dev/null 2>&1
   sleep 4.2
   show-status
-  echo;echo;echo "Enter a command or help for a list thereof"
+  echo "Hit C-c for exit; $PS1 <--inter?"
+  sleep infinity
+  sh
+}
 
-  rlwrap ecm-appd mux
-
+graceful_exit () {
+	echo "Cleaning up and exiting"
 }
 	
+trap graceful_exit SIGTERM
+
 if [ "$#" -eq 0 ]; then
 	  start
 else
