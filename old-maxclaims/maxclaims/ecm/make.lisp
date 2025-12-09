@@ -1,5 +1,6 @@
 (defpackage :ecm/make
   (:use cl)
+  (:import-from :maxclaims)
   (:import-from :ecm/start)
   (:import-from :uiop/run-program))
 (in-package :ecm/make)

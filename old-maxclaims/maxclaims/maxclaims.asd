@@ -11,6 +11,14 @@
 (defun project-relative-pathname (path)
   (merge-pathnames path (component-pathname (find-system :maxclaims))))
 
+(asdf:defsystem :maxclaims-src
+  :description "MaxHacky!"
+  :long-description "This is an attempt to see how the frig this was ever working"
+  :class :package-system
+  :defsystem-depends-on (:asdf-package-system)
+  :depends-on (:maxclaims))
+
+
 (defsystem :maxclaims
   :components 
   ((:static-file "maxclaims.asd")
@@ -87,15 +95,16 @@
    (:ecm/postgresql/connection
     :ecm/hack
     :hunchentoot
-	  :quux-hunchentoot
-	  :simple-date
-	  :split-sequence
-	  :drakma
-	  :relational-objects-for-lisp
-	  :yaclml
+	:quux-hunchentoot
+	:simple-date
+	:split-sequence
+	:drakma
+	:relational-objects-for-lisp
+	:yaclml
     :postmodern
-	  :ironclad
-	  :cl-postgres)
+	:ironclad
+	:cl-postgres
+	:swank)
   :version "3.0.14")
 
 

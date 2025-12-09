@@ -12,7 +12,9 @@
 	   #:redirect
 	   #:session-value
 	   #:*hunchentoot-acceptor*
-     #:make-maxclaims-acceptor))
+       #:make-maxclaims-acceptor))
+(uiop/package:define-package :maxclaims-src/src/hunchentoot
+	(:USE-REEXPORT :maxclaims/hunchentoot))
 
 (in-package :maxclaims/hunchentoot)
 

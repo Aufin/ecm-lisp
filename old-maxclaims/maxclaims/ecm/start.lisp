@@ -1,40 +1,21 @@
 (defpackage :ecm/start
   (:use :cl)
-  (:import-from #.(progn (ql:quickload '(cl-postgres simple-date simple-date/postgres-glue parenscript))
-                         :parenscript))
-  (:import-from #.(progn (ql:quickload '(cl-postgres simple-date simple-date/postgres-glue))
-                         :cl-postgres))
-  (:import-from #.(progn (ql:quickload '(simple-date simple-date/postgres-glue))
-                         :simple-date))
-  (:import-from :ecm/configuration
-		            #:configuration-value)
-  (:import-from :swank)
-  (:import-from :ecm/ps)
-  (:import-from :ecm/database)
-  (:import-from #.(progn (ql:quickload :maxclaims-ecm)
-
-			 (load (merge-pathnames "src/hunchentoot" (asdf:system-source-directory :maxclaims)))
-			 :maxclaims)
-		#:*attachment-directory*
-		#:*db-admin-parameters*
-		#:*db-connection-parameters*)
-  #+(or)(:import-from #.(progn (ql:quickload :maxclaims)
-                         (load (merge-pathnames
-                                "src/report/bordereau"
-                                (asdf:system-source-directory :maxclaims)))
-
-                         :maxclaims/report/bordereau))
-  (:import-from :ecm/hunchentoot)
-  (:import-from :ecm/endpoint/claim)
-  (:import-from :ecm/ecm-msg)
-  (:import-from #.(progn (ql:quickload :ecm/endpoint/corpus) :ecm/endpoint/corpus))
-  (:import-from :ecm/endpoint/transaction)
-  (:import-from #.(progn (ql:quickload :ecm/endpoint/report) :ecm/endpoint/report))
-  (:import-from :ecm/hack/login)
-  (:import-from #.(progn (ql:quickload :ECM/UI/REPORT/BORDEREAU-API)  :ecm/ui/report/bordereau-api))
-  (:import-from #.(progn (ql:quickload :ecm/endpoint/api) :ecm/endpoint/api))
-  (:import-from :maxclaims/hunchentoot
+  (:import-from :parenscript)
+  (:import-from :maxclaims)
+  (:import-from :maxclaims-src/src/hunchentoot
                 #:make-maxclaims-acceptor)
+  (:import-from :ecm/configuration)
+  (:import-from :maxclaims-ecm)
+  (:import-from :ecm/database)
+  (:import-from :ecm/hunchentoot) 
+  (:import-from :ecm/endpoint/claim) 
+  (:import-from :ecm/ecm-msg)
+  (:import-from :ecm/endpoint/corpus) 
+  (:import-from :ecm/endpoint/transaction) 
+  (:import-from :ecm/endpoint/report)
+  (:import-from :ecm/hack/login)
+  (:import-from :ecm/ui/report/bordereau-api)
+  (:import-from :ecm/endpoint/api)
   (:export #:start))
 (in-package :ecm/start)
 
