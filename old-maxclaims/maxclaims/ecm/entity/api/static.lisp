@@ -16,7 +16,7 @@
   (or (static-claims-report-%pathname scr)
       (setf
        (static-claims-report-%pathname scr)
-       (format nil "/tmp/~A/static-claims-~A.csv" (sb-posix:getpid) (gensym)))))
+       (format nil "/tablespaces/shared/csv/static-claims-~A-~A.csv" (sb-posix:getpid) (gensym)))))
 
 (defun static-claims-report-lines (scr)
    (or (static-claims-report-%lines scr)
@@ -28,15 +28,15 @@
 
 (defun run-static-claims-report (&optional (interval "3 months"))
   (let* ((rep (make-static-claims-report :interval interval))
-	 (name (static-claims-report-pathname rep)))
+		 (name (static-claims-report-pathname rep)))
     (ensure-directories-exist name)
     (sb-posix:chmod (make-pathname :directory (pathname-directory name))
-		    #x0777)
+					#x0777)
     (postmodern:with-transaction ()
       (postmodern:execute "CREATE TEMP TABLE _static_rep ON COMMIT DROP AS
        (SELECT * from static_claims_report($1));" interval)
-    (postmodern:execute
-     (format nil "COPY (SELECT * from _static_rep) TO '~a' DELIMITER ',' CSV HEADER" name)))
+      (postmodern:execute
+       (format nil "COPY (SELECT * from _static_rep) TO '~a' DELIMITER ',' CSV HEADER" name)))
     rep))
 
 (defvar *test-static*)

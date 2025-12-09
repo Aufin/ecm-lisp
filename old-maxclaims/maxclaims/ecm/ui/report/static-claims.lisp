@@ -16,11 +16,11 @@
     (<report-navbar> "Static Claims")
     (<> (div :style "height: 90vh; margin:auto; text-align:center;")
       (<> (div :class "my-auto")
-      (<> (form :method "POST")
-      (<> "Show me claims that have not had any movememt for ")
-	(<> (input :type "text" :name "interval":value "3 months"))
-	(<> 'br)
-	(<> (input :type "submit" :value "Download"))
-
-    )))))
+		(<> (form :method "POST")
+		  (<> "Show me claims that have not had any movement")(<> (a :href "#")"*")(<>" for:")
+		  (<> (input :type "text" :name "interval":value "3 months"))
+		  (<> 'br)
+		  (<> (input :type "submit" :value "Download"))
+		  (<> 'br)
+		  (<> (span :hidden) "* : Seriously, this had \"movememt\" as the spelling since around Feb 13, 2019 and it's now Dec 9, 2025 and nobody told me!? :)"))))))
   

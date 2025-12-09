@@ -59,6 +59,7 @@
       (error (c)
         (ecm/request-context:send-json-response
          (ecm/json:jso "error" (format nil "~A" c)))))))
+
 (define-endpoint bordereau-api-run "/ecm/report/api/bordereau/run/(.*)$")
 (defun bordereau-api-run/get (name)
   (ecm/request-context:with-request-context ()

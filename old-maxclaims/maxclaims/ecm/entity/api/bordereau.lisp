@@ -96,7 +96,8 @@
 
 (defgeneric bordereau-filename (bdx)
   (:method (bdx) (format
-                  nil "~A-~A.csv"
+                  nil "~A-~A-~A.csv"
+				  (SB-UNIX:UNIX-GETHOSTNAME)
                   (class-name (class-of bdx))
                   (bordereau-started-on bdx))))
 
@@ -113,7 +114,8 @@
 
 (defvar *bordereau-prep-number* 0)
 (defun bordereau-prep-id ()
-  (format nil "BDX-ID-~A" (incf *bordereau-prep-number*)))
+  (format nil "BDX-ID-~A-~A" (incf *bordereau-prep-number*)
+		  (SB-UNIX:UNIX-GETHOSTNAME)))
 (defgeneric bordereau-id (bordereau)
   (:method (bdx) (or (bordereau-%id bdx)
                      (setf (bordereau-%id bdx)
@@ -144,13 +146,16 @@
         ;;(warn "sql: ~A" sql)
       (progn
         (funcall stmt start-date proper-end-date)
-        (postmodern:execute
-         (format
-          nil
-          "COPY (SELECT * FROM ~W)
-            TO '~A' DELIMITER ',' CSV HEADER ENCODING 'WIN1252'"
-          (bordereau-id bdx)
-          (bordereau-pathname bdx)))
+		(postmodern:execute
+		 (format
+			  nil
+			  "COPY (SELECT * FROM ~W)
+            TO '~A' DELIMITER ',' CSV HEADER"
+			  (bordereau-id bdx)
+			  (bordereau-pathname bdx)))
+		(postmodern:execute
+		 "SELECT add_BOM_to_file($1::text)"
+		 (namestring (bordereau-pathname bdx)))
         (postmodern:execute (format nil "DROP TABLE ~W;" (bordereau-id bdx))))))))
 
 (defun ensure-bordereau-output-directory (bdx)
