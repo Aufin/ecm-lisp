@@ -1,5 +1,7 @@
 (defpackage :ecm/start
   (:use :cl)
+  (:import-from #.(progn (ql:quickload '(cl-postgres simple-date simple-date/postgres-glue parenscript))
+                         :parenscript))
   (:import-from #.(progn (ql:quickload '(cl-postgres simple-date simple-date/postgres-glue))
                          :cl-postgres))
   (:import-from #.(progn (ql:quickload '(simple-date simple-date/postgres-glue))
