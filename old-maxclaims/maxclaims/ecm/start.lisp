@@ -1,7 +1,10 @@
 (defpackage :ecm/start
   (:use :cl)
   (:import-from :parenscript)
-  (:import-from :maxclaims)
+  (:import-from :maxclaims
+				#:*attachment-directory*
+				#:*db-admin-parameters*
+				#:*db-connection-parameters*)
   (:import-from :maxclaims-src/src/hunchentoot
                 #:make-maxclaims-acceptor)
   (:import-from :ecm/configuration)
@@ -16,6 +19,9 @@
   (:import-from :ecm/hack/login)
   (:import-from :ecm/ui/report/bordereau-api)
   (:import-from :ecm/endpoint/api)
+  (:import-from :ecm/configuration
+		        #:configuration-value)
+
   (:export #:start))
 (in-package :ecm/start)
 
