@@ -7,6 +7,7 @@
   (:import-from :ecm/configuration
 		            #:configuration-value)
   (:import-from :swank)
+  (:import-from :ecm/ps)
   (:import-from :ecm/database)
   (:import-from #.(progn (ql:quickload :maxclaims-ecm)
 
