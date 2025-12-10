@@ -130,14 +130,14 @@
 (defun bordereau-download/get (name)
   (ecm/request-context:with-request-context ()
     (let* ((bdx (get-bordereau-instance name))
-	         (pathname (ecm/entity/api/bordereau::bordereau-pathname bdx))
-	         (content-disposition "attachment")
-	         (content-type "text/comma-separated-values")
-	         (filename (ecm/hunchentoot:parameter-or-nil
-			                   "bdx-filename")))
+	       (pathname (ecm/entity/api/bordereau::bordereau-pathname bdx))
+	       (content-disposition "attachment")
+	       (content-type "text/comma-separated-values")
+	       (filename (ecm/hunchentoot:parameter-or-nil
+			          "bdx-filename")))
       (setf (ecm/hunchentoot:header-out
-	     "Content-Disposition")
-	    (format nil "~A; filename=~W"
-		          content-disposition filename))
+			 "Content-Disposition")
+			(format nil "~A; filename=~W"
+					content-disposition filename))
       (ecm/hunchentoot:handle-static-file
        pathname content-type))))
