@@ -22,5 +22,11 @@
 		  (<> 'br)
 		  (<> (input :type "submit" :value "Download"))
 		  (<> 'br)
-		  (<> (span :hidden) "* : Seriously, this had \"movememt\" as the spelling since around Feb 13, 2019 and it's now Dec 9, 2025 and nobody told me!? :)"))))))
+		  (<> (span :hidden) "Seriously, this had \"movememt\" as the spelling since around Feb 13, 2019 and it's now Dec 9, 2025 and nobody told me!? :)")
+		  (<> (html5:script) "
+ const showMe = document.querySelector('.my-auto span'),
+       showYou = document.querySelector('.my-auto a')
+  showYou.onmouseover = () => showMe.hidden = false
+  showYou.onmouseout = () => showMe.hidden = true 
+ "))))))
   
