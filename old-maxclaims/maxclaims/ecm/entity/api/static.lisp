@@ -30,8 +30,6 @@
   (let* ((rep (make-static-claims-report :interval interval))
 		 (name (static-claims-report-pathname rep)))
     (ensure-directories-exist name)
-    (sb-posix:chmod (make-pathname :directory (pathname-directory name))
-					#x0777)
     (postmodern:with-transaction ()
       (postmodern:execute "CREATE TEMP TABLE _static_rep ON COMMIT DROP AS
        (SELECT * from static_claims_report($1));" interval)
