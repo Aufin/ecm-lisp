@@ -114,8 +114,8 @@
 
 (defvar *bordereau-prep-number* 0)
 (defun bordereau-prep-id ()
-  (format nil "BDX-ID-~A" (incf *bordereau-prep-number*)
-		  #+(or)(SB-UNIX:UNIX-GETHOSTNAME)))
+  (format nil "BDX-ID-~A-~A" (incf *bordereau-prep-number*)
+		  (SB-UNIX:UNIX-GETHOSTNAME)))
 (defgeneric bordereau-id (bordereau)
   (:method (bdx) (or (bordereau-%id bdx)
                      (setf (bordereau-%id bdx)

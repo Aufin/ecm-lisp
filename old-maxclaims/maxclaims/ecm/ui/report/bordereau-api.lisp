@@ -376,7 +376,7 @@ $('input[type=\"text\"]')
 
  ECM.downloadBdxByName = function (name, fn = 'bdx.csv') {
     const url = '/ecm/report/api/bordereau/download/' + name +
-      '?bdx-filename='+fn;
+      '?bdx-filename='+encodeURI(fn);
 
     window.location = url
  }
