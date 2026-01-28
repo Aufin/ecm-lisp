@@ -37,6 +37,9 @@
   
 (in-package :maxclaims/entry-point/reports)
 
+(defun user-can-view-admin? (&optional (user maxclaims::$app-user))
+  (getf (maxclaims/data-entity/app-user:app-user-get-acl user "admin_reports")
+		:READ NIL))
 
 (defun reports-handler ()
     (let ((reports (http-parameters-as-alist "report")))
@@ -235,11 +238,12 @@
 	       (<:a :href "/ecm/report/mi"
 		    :target "_blank"
 		    "Performance Management Information (MI)")))
-	     (when (maxclaims/data-entity/app-user:app-user-administrator-p
-		    maxclaims::$app-user)
+
+		 
+	     (when (user-can-view-admin?)
 
                     
-	       (<:h1 "Administrator Reports")
+	       (<:h1 "Administrator Reportsa")
 	       (<:li 
 		(<:a :href "create?create[type]=interim-report&access[read-only]=false"
 		     :target "_blank"

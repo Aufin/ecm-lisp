@@ -12,6 +12,11 @@
   (:export #:bordereau-page))
 (in-package :ecm/ui/report)
 
+
+(defun user-can-view-admin? (&optional (user maxclaims::$app-user))
+  (getf (maxclaims/data-entity/app-user:app-user-get-acl user "admin_reports")
+		:READ NIL))
+
 (defun report-page ()
   (<> '(ecm/ui/page:page :title "Reports")
     (<report-navbar> "Reports")
@@ -130,10 +135,13 @@
 	        (<> (li)
 	          (<> (a :href "/report/cheque-register")
 	            "Agency or Contract"))))
-      (when (ecm/user:user-is-administrator-p)
+      (when (user-can-view-admin?)
 	      (<> (div :class "col-md-4")
 	        (<> (h3) "Administrator")
 	        (<> (ul)
+			  (<> (li)
+		          (<> (a :href "/history/")
+		            "Claim Movement History"))
 	          (<> (li)
 		          (<> (a :href "/ecm/create?create[type]=interim-report&access[read-only]=false")
 		            "Interim Amounts"))

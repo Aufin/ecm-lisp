@@ -28,9 +28,14 @@
 	   #:app-user-contracts
 	   #:app-user-rolename
 	   #:insert-app-user
-	   #:update-app-user))
+	   #:update-app-user
+	   #:app-user-get-acl))
 
 (in-package :maxclaims/data-entity/app-user)
+
+(defun app-user-get-acl (app-user klass)
+  "=> plist with :create :read :update :delete booleans"
+  (car (select '* :from `(get-acl ,klass ,(app-user.username app-user)))))
 
 (defun app-user-person-or-username (app-user)
   (or (ignore-errors (app-user.person app-user))
