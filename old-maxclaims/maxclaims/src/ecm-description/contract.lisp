@@ -1,6 +1,5 @@
 (defpackage :maxclaims/ecm-description/contract (:use))
 (in-package :maxclaims/ecm-description)
-(import 'maxclaims::loss-fund)
 
 (symbol-macrolet 
     ((|contract edit create| 
@@ -160,5 +159,4 @@
   (format nil "$~,vf~%" 2
 		  (cadar (maxclaims::select
 		   `(:contract-loss-fund-balance
-			 ,(maxclaims::contract.contract-id contract)
-			 )))))
+			 ,(maxclaims::contract.contract-id contract))))))

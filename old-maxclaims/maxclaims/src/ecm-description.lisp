@@ -256,6 +256,7 @@
 		#:postal-code
 		#:policy.insured
 		#:date
+		#:loss-fund
 		#:contract
 		#:contract-number
 		#:contract.contract-id
