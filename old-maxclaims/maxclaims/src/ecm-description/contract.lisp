@@ -159,6 +159,4 @@
   (let ((bal (cadar (maxclaims::select
 		   `(:contract-loss-fund-balance
 			 ,(maxclaims::contract.contract-id contract))))))
-	(if (numberp bal)
-		(format nil "~,vf~%" 2 bal)
-		bal)))
+	(and (numberp bal) (format nil "~,vf~%" 2 bal))))
