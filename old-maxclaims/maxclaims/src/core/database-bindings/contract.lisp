@@ -8,6 +8,7 @@
    agency-id
    syndicate-id
    london-broker-id
+   loss-fund
    (agency :column agency-id 
 	   :references (person person-id))
    (syndicate :column syndicate-id 

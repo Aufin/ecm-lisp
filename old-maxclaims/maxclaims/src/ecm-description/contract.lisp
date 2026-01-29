@@ -1,5 +1,6 @@
 (defpackage :maxclaims/ecm-description/contract (:use))
 (in-package :maxclaims/ecm-description)
+(import 'maxclaims::loss-fund)
 
 (symbol-macrolet 
     ((|contract edit create| 
@@ -30,7 +31,9 @@
 	 :select-objects (:search maxclaims::string-search-person
 			  :existing)
 	 :type person
-	 :active t)
+				   :active t)
+		(loss-fund :label "Loss Fund Limit"
+				   :active t)
 	)))
   
   (macrolet 
@@ -63,7 +66,13 @@
 	     (contract-authority :label "Authority"				    
 				 :as-table (:create contract-authority
 						    contract-id)
-				 :single t)
+							 :single t)
+		 (loss-fund
+		  :label "Loss Fund Limit",
+		  :active :when)
+		 (loss-fund-balance
+		  :label "Loss Fund balance",
+		  :active :when)
 	     (view-a-btn
 	      :label "Reports"
 	      :activate (contract-bordereau))
@@ -139,3 +148,17 @@
       (declare (ignorable _))      
       `(:select * :from 'risk
 		:where (:= contract-id ,(maxclaims::contract.contract-id contract))))))))
+
+(defmethod object-attribute-value ((contract contract) 
+								   (a (eql 'loss-fund)) 
+								   &key &allow-other-keys)
+  (format nil "$~,vf~%" 2 (call-next-method)))
+
+(defmethod object-attribute-value ((contract contract) 
+								   (a (eql 'loss-fund-balance)) 
+								   &key &allow-other-keys)
+  (format nil "$~,vf~%" 2
+		  (cadar (maxclaims::select
+		   `(:contract-loss-fund-balance
+			 ,(maxclaims::contract.contract-id contract)
+			 )))))

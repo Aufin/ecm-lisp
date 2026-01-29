@@ -230,6 +230,7 @@ $(function() {
 	     (policy (getjso "policy" risk))
 	     (london-broker (getjso "london_broker" risk))
 	     (contract (getjso "contract" risk))
+	     (loss-fund-balance (getjso "loss_fund_balance" contract))
 	     (sub (getjso "subscription_percent" claim))
          (num (getjso "risk_number" risk)))
     ;;(warn "Viewing claim risk: ~A" risk)
@@ -269,17 +270,25 @@ $(function() {
      ;(<> "LONDON BROKER GOES HERE")
      ; (<item> "London Browser" london-broker)
       (when london-broker
-      (<> (div :class "row is-table-row")
-	(<> (div :class "col-3  text-xs-left align-baseline")
-	  (<> (h5 :class "align-baseline")
-	    (<link-to-viewer>
-		("person" (getjso "_id" london-broker) :style "color:gray")
-	      (<> :unescaped "&nbsp;London Broker"))))
-	(<> (div :class "col-9  text-xs-left")
-	  (<link-to-viewer>
-	      ("person" (getjso "_id" london-broker))
+		(<> (div :class "row is-table-row")
+		  (<> (div :class "col-3  text-xs-left align-baseline")
+			(<> (h5 :class "align-baseline")
+			  (<link-to-viewer>
+				  ("person" (getjso "_id" london-broker) :style "color:gray")
+				(<> :unescaped "&nbsp;London Broker"))))
+		  (<> (div :class "col-9  text-xs-left")
+			(<link-to-viewer>
+				("person" (getjso "_id" london-broker))
 		  
-	    (<> :text (corpus-name london-broker))))))
+			  (<> :text (corpus-name london-broker))))))
+	  ;; * Loss Fund Balance
+	  (when loss-fund-balance
+		(<> (div :class "row is-table-row")
+		  (<> (div :class "col-3  text-xs-left align-baseline")
+			(<> (h5 :class "align-baseline" :style "color:grey")
+			  (<> :unescaped "&nbsp;Loss Fund")))
+		  (<> (div :class "col-9  text-xs-left")
+			(<> :text "$"(format nil "~,vf~%" 2 loss-fund-balance)))))
         ;; ** Risk COde
 
         (<risk-code> code
