@@ -70,7 +70,7 @@
 		  :label "Loss Fund Limit",
 		  :active :when)
 		 (loss-fund-balance
-		  :label "Loss Fund balance",
+		  :label "Loss Fund Balance",
 		  :active :when)
 	     (view-a-btn
 	      :label "Reports"
