@@ -151,12 +151,14 @@
 (defmethod object-attribute-value ((contract contract) 
 								   (a (eql 'loss-fund)) 
 								   &key &allow-other-keys)
-  (format nil "$~,vf~%" 2 (call-next-method)))
+  (format nil "~,vf~%" 2 (call-next-method)))
 
 (defmethod object-attribute-value ((contract contract) 
 								   (a (eql 'loss-fund-balance)) 
 								   &key &allow-other-keys)
-  (format nil "$~,vf~%" 2
-		  (cadar (maxclaims::select
+  (let ((bal (cadar (maxclaims::select
 		   `(:contract-loss-fund-balance
 			 ,(maxclaims::contract.contract-id contract))))))
+	(if (numberp bal)
+		(format nil "~,vf~%" 2 bal)
+		bal)))
