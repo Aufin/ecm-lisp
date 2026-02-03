@@ -424,24 +424,28 @@ $(function () {
                  (ps:chain ($ ".datepicker")
                            (datepicker
                             "option" "dateFormat" "yy-mm-dd"))
-                 (let* ((date (ps:new (|Date|)))
-                        (month (ps:chain date (get-month)))
-                        (year (ps:chain date (get-full-year)))
+                 (let* ((startdate (ps:new (|Date|)))
+						(enddate (ps:new (|Date|)))
+                        (month (ps:chain enddate (get-month)))
+                        (year (ps:chain enddate (get-full-year)))
                         )
-		               (|.| date (set-date 1))
-		               (when (= "" (|.| ($ "#endDate") (val)))
-		                 (ps:chain ($ "#endDate")
-			                         (datepicker "setDate" date)))
-                   (|.| date  (set-month
+		           (|.| enddate (set-date 1))
+		           (|.| startdate (set-date 1))
+		           (when (= "" (|.| ($ "#endDate") (val)))
+		             (ps:chain ($ "#endDate")
+			                   (datepicker "setDate" enddate)))
+				   (|.| startdate (set-year
+                              (if (= month 0)
+                                  (ps:decf year)
+                                  year)))
+                   (|.| startdate  (set-month
                                (if (= month 0)
                                    11
                                    (ps:decf month))))
-                   (|.| date (set-year
-                              (if (= month 0)
-                                  (decf year)
-                                  year)))
-                   (when (= "" (|.| ($ "#startDate") (val)))
+                   
+				   ;; (ps:chain console (debug (ps:new (|Date|)) startdate))
+                    (when (= "" (|.| ($ "#startDate") (val)))
                      (ps:chain ($ "#startDate")
-                               (datepicker "setDate" date))))))))
+                               (datepicker "setDate" startdate))))))))
 
         ))))
