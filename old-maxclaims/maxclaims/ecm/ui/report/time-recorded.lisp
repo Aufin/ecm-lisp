@@ -192,7 +192,7 @@ $(\"#reportFrame\").load(function() {
 			"maxDate"  0
 			"controlType" "select"
 			"oneLine" t
-			"onSelect" (lambda ()
+			#+(or)"onSelect" #+(or)(lambda ()
 						 (console.log this)			       
 						 (let ((inputs
 								 ($. this
@@ -207,33 +207,28 @@ $(\"#reportFrame\").load(function() {
 			)))))))
     (<> '(div :class "row row-centered")
 
-      (<> '(div :class "col-md-4 col-centered")
+      (<> '(div :class "col-md-6 col-centered")
         (<> '(div :class "row-centered")
           (<> 'h3 (<> "Start Time (including)"))
           (<> '(input :name "start-time"
                 :class "datepicker"
                 :id "start-time"
 		:type "text"))))
-      (<> '(div :class "col-md-4 col-centered")
+      (<> '(div :class "col-md-6 col-centered")
         (<> '(div :class "row-centered")
           (<> 'h3 (<> "Stop Time (excluding)"))
           (<> '(input :name "end-time"
                 :class "datepicker"
                 :id "end-time"
 		:type "text")))))
-    (<> '(div :class "row row-centered report")
+
+	(<> '(div :class "row row-centered report")
       (<> '(span :id "ss-type-span"
-	    :class "row-centered"))
+			:style "width: 100%"
+			:class "row-centered"))
       (<> 'br)
       (<> '(button :type "submit" :class "btn btn-success")
-	(<> "View Report"))
-      (<> 'br)
-      (<> '(div :class "col-xs-6 col-centered")
-
-	#+(or)          (<> " as ")
-	#+(or)(<spreadsheet-type-select> 
-	       :name "spreadsheet-type"
-	       :class "spreadsheet-type-select")))))
+		(<> "View Report")))))
 
 
 
