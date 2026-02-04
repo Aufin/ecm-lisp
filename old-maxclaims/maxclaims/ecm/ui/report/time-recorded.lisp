@@ -182,26 +182,29 @@ $(\"#reportFrame\").load(function() {
 	    (ps:chain
 	     ($ ".datepicker")
 	     (datetimepicker
-	      ({} "changeMonth" t
-		  "orientation" "bottom"
-		  "showTimezone" t
-		  "timeFormat" "HH:mm:ss Z"
-		  "timeInput" t
-		  "dateFormat" "D, d M yy"
-		  "maxDate"  0
-		  "controlType" "select"
-		  "oneLine" t
-		  "onSelect" (lambda ()
-			       (console.log this)			       
-			       (let ((inputs
-				      ($. this
-					  (closest "form")
-					  (find ":input"))))
-				 (|.| inputs (eq (+ (inputs.index this) 1))
-				      (focus))
-				 (|.| ($ ".datepicker")
-				      (datetimepicker "hide"))))
-		  "hourMax" (ps:chain (moment) (hour)))))))))
+	      ({}
+			"changeMonth" t
+			"orientation" "bottom"
+			"showTimezone" t
+			"timeFormat" "HH:mm:ss Z"
+			"timeInput" t
+			"dateFormat" "D, d M yy"
+			"maxDate"  0
+			"controlType" "select"
+			"oneLine" t
+			"onSelect" (lambda ()
+						 (console.log this)			       
+						 (let ((inputs
+								 ($. this
+									 (closest "form")
+									 (find ":input"))))
+						   (|.| inputs (eq (+ (inputs.index this) 1))
+								(focus))
+						   (|.| ($ ".datepicker")
+								(datetimepicker "hide"))))
+			;;"hourMax" (ps:chain (moment) (hour))
+
+			)))))))
     (<> '(div :class "row row-centered")
 
       (<> '(div :class "col-md-4 col-centered")
