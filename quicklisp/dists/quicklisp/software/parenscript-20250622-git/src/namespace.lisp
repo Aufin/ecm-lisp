@@ -38,13 +38,13 @@
 (in-package #:parenscript)
 (named-readtables:in-readtable :parenscript)
 
-(defvar *obfuscated-packages* (make-hash-table))
+(defvar *obfuscated-packages* (make-hash-table :synchronized t))
 
 (defun obfuscate-package (package-designator &optional symbol-map)
   (setf (gethash (find-package package-designator)
                  *obfuscated-packages*)
         (or symbol-map
-            (let ((symbol-table (make-hash-table)))
+            (let ((symbol-table (make-hash-table :synchronized t)))
               (lambda (symbol)
                 (or (gethash symbol symbol-table)
                     (setf (gethash symbol symbol-table)
@@ -60,7 +60,7 @@
            (funcall it symbol)
            symbol)))
 
-(defvar *package-prefix-table* (make-hash-table))
+(defvar *package-prefix-table* (make-hash-table :synchronized t))
 
 (defmacro ps-package-prefix (package)
   `(gethash (find-package ,package) *package-prefix-table*))

@@ -44,7 +44,7 @@
 (define-condition simple-style-warning (simple-warning style-warning)
   ())
 
-(let ((cache (make-hash-table :test 'equal)))
+(let ((cache (make-hash-table :test 'equal :synchronized t)))
   (defun encode-js-identifier (identifier)
     "Given a string, produces to a valid JavaScript identifier by
 following transformation heuristics case conversion. For example,
@@ -57,7 +57,7 @@ paren-script becomes parenScript, *some-global* becomes SOMEGLOBAL."
 This compound naming convention is deprecated and will be removed!
 Use AREF, ELT, GETPROP, @, or CHAIN instead."
             :format-arguments (list identifier)))
-    (when (find #\. identifier)
+    #+(or)(when (find #\. identifier)
       (warn 'simple-style-warning
             :format-control
             "Parenscript symbol ~A contains one or more dot operators.
