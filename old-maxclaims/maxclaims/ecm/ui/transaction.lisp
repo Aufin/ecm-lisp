@@ -366,8 +366,8 @@ $(function() {
 	   (schemes-advance-number (ecm/json:getjso* "cheque.schemes_advance_number" transaction)))
                                         ;  (break "~A" approved)
   (<> (ecm/ui/page:page :title (unless inline "transaction"))
-	(when (not inline) (<> (ecm/ui/navbar:navbar)))
-	(<> :text (format nil "Inline ~W" (not inline)))
+	;; (when (not inline) (<> (ecm/ui/navbar:navbar)))
+	;; (<> :text (format nil "Inline ~W" (not inline)))
 	(create-or-update-transaction-elements
 	 claim-id error date type expense-type heading amount limit-of-cover interim-id payee recipient cheque-number reference-number schemes-advance-number date-paid)
     ))
