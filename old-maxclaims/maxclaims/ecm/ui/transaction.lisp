@@ -19,6 +19,26 @@
 	   #:edit-transaction-inline-finished))
 (in-package :ecm/ui/transaction)
 
+(defun find-possible-interims (claim-id)
+  (postmodern:query
+   "SELECT to_json(ti) FROM timecard_interim ti WHERE claim_id = $1 AND invoice_id IS NULL ORDER BY date" claim-id :column))
+
+
+(defun <transaction-interim-select> (claim-id &key (selected nil))
+  (<> (html5:select :name "interim-id"
+					:class "form-control")
+    (<> (html5:option :value "") (<> :text ""))
+    (dolist (ti (find-possible-interims claim-id))
+	  (let* ((tij (st-json:read-json-from-string ti))
+			 (text (st-json:getjso "date" tij))
+			 (id (st-json:getjso "timecard_interim_id" tij)))
+		
+		(<> `(html5:option :value ,id ,@(when (equalp id selected)
+										 '(:selected t)))
+		  (<> :text (split-sequence:split-sequence #\T text)))))))
+
+
+
 (defun <transaction-style> (&key (id "ecmClaimTransactionTable"))
   (<> (html5:style)
     ".cheque {
@@ -156,12 +176,23 @@ td:hover > .div-to-display {
 
 (defun <transaction-ui-script> ()
   (<> (html5:script) '|
+
 function trannyUserInterface() {
     var ttype_select = $('select[name="transaction-type"]');
     var ttype = $(ttype_select).val();
     var c1 = $('.cheque');
     var c2 = $('#cheque');
     var or1 = $('#open_reserve');
+
+    const // interim_select = document.querySelector('select[name=interim-id]'),
+          heading_select = document.querySelector('select[name=transaction-heading]'),
+          htype = heading_select.value
+          //isp = interim_select.parentElement.parentElement,
+          ishide = !(htype == 'TPA' && ttype == 'Cheque - Expense')
+   // isp.children[2].hidden = ishide
+   // isp.children[3].hidden = ishide
+
+  //  console.debug('isel', interim_select, isp);
 
     $(c1).hide(); $(c2).hide(); $(or1).hide();
 
@@ -177,21 +208,130 @@ $(function() {
     $('select[name="transaction-type"]').change(function() {
             trannyUserInterface();
     })
+    const heading_select = document.querySelector('select[name=transaction-heading]')
+   $(heading_select).change(function() {
+            trannyUserInterface();
+    })
+
 });
 |)
   )
+
+(defun create-or-update-transaction-elements (claim-id
+											  &optional
+												(error nil)
+												(date nil)
+												(type nil)
+												(expense-type nil)
+												(heading nil)
+												(amount nil)
+												(limit-of-cover nil)
+												(interim-id nil)
+												(payee nil)
+												(recipient nil)
+												(cheque-number nil)
+												(reference-number nil)
+												(schemes-advance-number nil)
+												(date-paid nil))
+
+											 
+  (when error
+	(<> (p :class "text-danger")
+	  (<> (pre) (<> :text (princ-to-string error)))))
+  (<> (style)
+	".form-control { margin-bottom : 2px; }:")
+  (<> (form :method "POST")
+    (macrolet ((row (name value name2 value2 &key (head 'h3))
+		         `(<> (div :class "row")
+					(<> (div :class "col-md-2") (<> (,head) (<> (:text ,name))))
+		            (<> (div :class "col-md-4") ,value)
+		            (<> (div :class "col-md-2") (<> (,head) (<> (:text ,name2))))
+		            (<> (div :class "col-md-4") ,value2))))
+      (<transaction-style>)
+      (row "Date:" (<transaction-datepicker>
+		            :date date)
+	       "Type:" (<transaction-types-select>
+		            :selected type))
+      (row "Heading:" (<transaction-headings-select>
+		               :selected heading)
+	       "Amount:" (<transaction-amount> amount))
+      (<> (div :id "cheque")
+        (row "Expense:" (<transaction-expense-types-select>
+		                 :selected expense-type)
+			 "" ""
+	         #+(or)"Interim:"
+			 #+(or)(<transaction-interim-select>
+					claim-id :selected interim-id)
+			 )
+
+		)
+      (<> (div :id "open_reserve" :style "padding-top:10px;")
+        (<> (div :class "row justify-content-center")
+		  (<> (div :class "col-md-2")
+		    (<> (h3) "Limit Of Cover"))
+		  (<> (div :class "col-md-4")
+		    (<transaction-limit-of-cover> limit-of-cover))))
+      (<> (div :class "cheque")
+	    (<> (div :class "row" :style "margin-bottom:5px")
+	      (<> (div :class "col-md-2")
+	        (<> 'h3 (<> (:text "Payee"))))
+	      (<> (div :class "col-md-10")
+	        (ecm/ui/corpus:<corpus-input> payee)))
+		
+	    (<> (div :class "row" :style "margin-bottom:5px")
+	      (<> (div :class "col-md-3")
+	        (<> 'h3 (<> (:text "Cheque Number"))))
+	      (<> (div :class "col-md-9")
+	        (<> (input :type "text" :class "form-control" 
+		               :name "transaction-cheque-number"
+		               :value cheque-number))))
+		(<> (div :class "row" :style "margin-bottom:5px")
+	      (<> (div :class "col-md-2")
+	        (<> 'h3 (<> (:text "Date Paid"))))
+	      (<> (div :class "col-md-10")
+	        (<transaction-datepicker>
+			 :date (or date-paid "")
+			 :name "transaction-date-paid")))
+	    (row "Schemes Advance #" (<> (input :type "text" :class "form-control" 
+				                            :name "transaction-schemes-advance-number"
+				                            :value schemes-advance-number))
+	         "Reference #" (<> (input :type "text" :class "form-control" 
+				                      :name "transaction-reference-number"
+				                      :value reference-number))
+	         :head h5)
+        (<> (div :class "row" :style "margin-bottom:5px")
+	      (<> (div :class "col-md-4")
+	        (<> 'h3 (<> (:text "Recipient")))
+            (<> 'small "(cheque to be sent to)"))
+	      (<> (div :class "col-md-8")
+	        (ecm/ui/corpus:<corpus-input> recipient :name "recipient-id" :prefix "r-")))
+        )
+
+      (<> (button :type "submit" :class "btn btn-success risk-edit-submit" :style "float:left")
+		"Create Transaction")
+	  (<> (a :id "cancelUpdateTransaction"
+		     :class "btn btn-danger" :style "float:right")
+		"Cancel"))
+    (<> (script) '|$( "#cancelUpdateTransaction" ).click(function( event ) {
+  event.preventDefault();
+  parent.risk.hide_edit();
+});|)
+    (<transaction-ui-script>)
+
+    ))
 (defun create-transaction-page
     (claim-id
 	 &key
 	   (inline t)
 	   (error nil)
 	   (date)
+	   (date-paid)
 	   (type)
 	   (expense-type)
 	   (heading)
 	   (amount)
        (limit-of-cover)
-	   (approved)
+	   (interim-id)
 	   (payee)
 	   (recipient)
 	   (cheque-number)
@@ -199,177 +339,38 @@ $(function() {
 	   (schemes-advance-number))
   (declare (ignorable claim-id))
   (<> (ecm/ui/page:page :title (unless inline "transaction"))
-    (when error
-      (<> (p :class "text-danger")
-	      (<> (pre) (<> :text (princ-to-string error)))))
-    (<> (style)
-      ".form-control { margin-bottom : 2px; }:")
-    (<> (form :method "POST")
-      (macrolet ((row (name value name2 value2 &key (head 'h3))
-		               `(<> (div :class "row")
-		                  (<> (div :class "col-md-2")
-		                    (<> (,head) (<> (:text ,name))))
-		                  (<> (div :class "col-md-4")
-		                    ,value)
-		                  (<> (div :class "col-md-2")
-		                    (<> (,head) (<> (:text ,name2))))
-		                  (<> (div :class "col-md-4")
-		                    ,value2))))
-        (<transaction-style>)
-        (row "Date:" (<transaction-datepicker>
-		                  :date date)
-	           "Type:" (<transaction-types-select>
-		                  :selected type))
-        (row "Heading:" (<transaction-headings-select>
-		                     :selected heading)
-	           "Amount:" (<transaction-amount> amount))
-        (<> (div :id "cheque")
-          (row "Expense:" (<transaction-expense-types-select>
-		                       :selected expense-type)
-	             "Approved:" (<transaction-approved> approved)))
-        (<> (div :id "open_reserve" :style "padding-top:10px;")
-          (<> (div :class "row justify-content-center")
-		        (<> (div :class "col-md-2")
-		          (<> (h3) "Limit Of Cover"))
-		        (<> (div :class "col-md-4")
-		          (<transaction-limit-of-cover> limit-of-cover))))
-        (<> (div :class "cheque")
-
-	        (<> (div :class "row" :style "margin-bottom:5px")
-	          (<> (div :class "col-md-2")
-	            (<> 'h3 (<> (:text "Payee"))))
-	          (<> (div :class "col-md-10")
-	            (ecm/ui/corpus:<corpus-input> payee)))
-	        (<> (div :class "row" :style "margin-bottom:5px")
-	          (<> (div :class "col-md-3")
-	            (<> 'h3 (<> (:text "Cheque Number"))))
-	          (<> (div :class "col-md-9")
-	            (<> (input :type "text" :class "form-control" 
-		                     :name "transaction-cheque-number"
-		                     :value cheque-number))))
-	        (row "Schemes Advance #" (<> (input :type "text" :class "form-control" 
-				                                      :name "transaction-schemes-advance-number"
-				                                      :value schemes-advance-number))
-	             "Reference #" (<> (input :type "text" :class "form-control" 
-				                                :name "transaction-reference-number"
-				                                :value reference-number))
-	             :head h5)
-          (<> (div :class "row" :style "margin-bottom:5px")
-	        (<> (div :class "col-md-4")
-	          (<> 'h3 (<> (:text "Recipient")))
-              (<> 'small "(cheque to be sent to)"))
-	        (<> (div :class "col-md-8")
-	          (ecm/ui/corpus:<corpus-input> recipient :name "recipient-id" :prefix "r-")))
-          )
-
-        (<> (button :type "submit" :class "btn btn-success risk-edit-submit" :style "float:left")
-		      "Create Transaction")
-	      (<> (a :id "cancelUpdateTransaction"
-		           :class "btn btn-danger" :style "float:right")
-		      "Cancel"))
-      (<> (script) '|$( "#cancelUpdateTransaction" ).click(function( event ) {
-  event.preventDefault();
-  parent.risk.hide_edit();
-});|)
-      (<transaction-ui-script>)
-
-      ))
-  )
+	(create-or-update-transaction-elements
+	 claim-id error date type expense-type heading amount limit-of-cover interim-id payee recipient cheque-number reference-number schemes-advance-number date-paid)))
   
 (defun edit-transaction-page
     (transaction
-		 &key (inline t)
-			 (error nil)
-			 (date (getjso "transaction_date" transaction))
-			 (type (getjso  "type" transaction))
-			 (expense-type (getjso "expense_type"
-						                 transaction))
-			 (heading (getjso "heading" transaction))
-			 (amount (getjso "amount" transaction))
-			 (limit-of-cover (getjso "limit-of-cover" transaction))
-			 (approved (ecm/json:from-json-bool
-					        (ecm/json:getjso "approved" transaction)))
-			 (payee (ecm/json:getjso* "cheque.payee" transaction))
-			 (recipient (ecm/json:getjso* "cheque.recipient" transaction))
-			 (cheque-number (ecm/json:getjso* "cheque.cheque_number" transaction))
-			 (reference-number (ecm/json:getjso* "cheque.reference_number" transaction))
-			 (schemes-advance-number (ecm/json:getjso* "cheque.schemes_advance_number" transaction)))
+	 &key
+	   (claim-id (getjso "claim_id" transaction))
+	   (inline t)
+	   (error nil)
+	   (date (getjso "transaction_date" transaction))
+	   (date-paid (getjso "date_paid" transaction))
+	   (type (getjso  "type" transaction))
+	   (expense-type (getjso "expense_type"
+						     transaction))
+	   (heading (getjso "heading" transaction))
+	   (amount (getjso "amount" transaction))
+	   (approved (ecm/json:from-json-bool
+				  (getjso "appoved" transaction)))
+	   (limit-of-cover (getjso "limit_of_cover" transaction))
+	   (interim-id (ecm/json:getjso "interim_id" transaction))
+	   (payee (ecm/json:getjso* "cheque.payee" transaction))
+	   (recipient (ecm/json:getjso* "cheque.recipient" transaction))
+	   (cheque-number (ecm/json:getjso* "cheque.cheque_number" transaction))
+	   (reference-number (ecm/json:getjso* "cheque.reference_number" transaction))
+	   (schemes-advance-number (ecm/json:getjso* "cheque.schemes_advance_number" transaction)))
                                         ;  (break "~A" approved)
   (<> (ecm/ui/page:page :title (unless inline "transaction"))
-    (when error
-      (<> (p :class "text-danger")
-	      (<> (pre) (<> :text (princ-to-string error)))))
-    (<> (style)
-      ".form-control { margin-bottom : 2px; }:")
-    (<> (form :method "POST")
-      (macrolet ((row (name value name2 value2 &key (head 'h3))
-		               `(<> (div :class "row")
-		                  (<> (div :class "col-md-2")
-		                    (<> (,head) (<> (:text ,name))))
-		                  (<> (div :class "col-md-4")
-		                    ,value)
-		                  (<> (div :class "col-md-2")
-		                    (<> (,head) (<> (:text ,name2))))
-		                  (<> (div :class "col-md-4")
-		                    ,value2))))
-        (<transaction-style>)
-        (row "Date:" (<transaction-datepicker>
-		                  :date date)
-	           "Type:" (<transaction-types-select>
-		                  :selected type))
-        (row "Heading:" (<transaction-headings-select>
-		                     :selected heading)
-	           "Amount:" (<transaction-amount> amount))
-
-        (<> (div :id "open_reserve" :style "padding-top:10px;")
-          (<> (div :class "row justify-content-center")
-		        (<> (div :class "col-md-2")
-		          (<> (h3) "Limit Of Cover"))
-		        (<> (div :class "col-md-4")
-		          (<transaction-limit-of-cover> limit-of-cover))))
-        (<> (div :id "cheque")
-          (row "Expense:" (<transaction-expense-types-select>
-		                       :selected expense-type)
-	             "Approved:" (<transaction-approved> approved)))
-
-        (<> (div :class "cheque")
-	        (<> (div :class "row" :style "margin-bottom:5px")
-	          (<> (div :class "col-md-2")
-	            (<> 'h3 (<> (:text "Payee"))))
-	          (<> (div :class "col-md-10")
-	            (ecm/ui/corpus:<corpus-input> payee)))
-	        (<> (div :class "row" :style "margin-bottom:5px")
-	          (<> (div :class "col-md-3")
-	            (<> 'h3 (<> (:text "Cheque Number"))))
-	          (<> (div :class "col-md-9")
-	            (<> (input :type "text" :class "form-control" 
-		                     :name "transaction-cheque-number"
-		                     :value cheque-number))))
-	        (row "Schemes Advance #" (<> (input :type "text" :class "form-control" 
-				                                      :name "transaction-schemes-advance-number"
-				                                      :value schemes-advance-number))
-	             "Reference #" (<> (input :type "text" :class "form-control" 
-				                                :name "transaction-reference-number"
-				                                :value reference-number))
-	             :head h5)
-          (<> (div :class "row" :style "margin-bottom:5px")
-	        (<> (div :class "col-md-4")
-	          (<> 'h3 (<> (:text "Recipient")))
-              (<> 'small "(cheque to be sent to)"))
-	        (<> (div :class "col-md-8")
-              (ecm/ui/corpus:<corpus-input> recipient :name "recipient-id" :prefix "r-")
-	          ))
-          )
-
-        (<> (button :type "submit" :class "btn btn-success risk-edit-submit" :style "float:left")
-		      "Update Transaction")
-	      (<> (a :id "cancelUpdateTransaction"
-		           :class "btn btn-danger" :style "float:right")
-		      "Cancel"))
-      (<> (script) '|$( "#cancelUpdateTransaction" ).click(function( event ) {
-  event.preventDefault();
-  parent.risk.hide_edit();
-});|)(<transaction-ui-script>)    #+(or)(<> :text transaction))))
+	(when (not inline) (<> (ecm/ui/navbar:navbar)))
+	(<> :text (format nil "Inline ~W" (not inline)))
+	(create-or-update-transaction-elements
+	 claim-id error date type expense-type heading amount limit-of-cover interim-id payee recipient cheque-number reference-number schemes-advance-number date-paid)
+    ))
 
 (defun edit-transaction-inline-finished (transaction-id claim-id)
   (<> (ecm/ui/page:page)
@@ -433,7 +434,7 @@ $(function() {
 	       
 (defun <transaction-amount> (amount)
   (<> (div :class "input-group")
-      (<>(div :class "input-group-addon")"$")
+      ;;(<>(div :class "input-group-addon")"$")
       (<> (input :type "text" :class "form-control" :placeholder "0.00"
 	               :name "transaction-amount"
 	               :value amount))))
@@ -474,16 +475,16 @@ $(function() {
 	(<> :text type)))))
 
 
-(defun <transaction-datepicker> (&key (date nil))
-  (<> (input :type "text" :name "transaction-date"
+(defun <transaction-datepicker> (&key (date nil) (name "transaction-date"))
+  (<> (input :type "text" :name name
 	           :class "datepicker form-control"
 	           :size 26
 	           :value (if date
-			                  (ecm/ui/utility:format-timestring date)
-			                  (ecm/ui/utility:format-timestring
-			                   (ecm/local-time:format-rfc3339-timestring
-			                    t (ecm/local-time:universal-to-timestamp
-			                       (get-universal-time)))))))
+			              (if (equalp date "") "" (ecm/ui/utility:format-timestring date))
+			              (ecm/ui/utility:format-timestring
+			               (ecm/local-time:format-rfc3339-timestring
+			                t (ecm/local-time:universal-to-timestamp
+			                   (get-universal-time)))))))
   (<> 'html5:script
     (ps:ps
       ($(lambda ()
@@ -620,6 +621,7 @@ $(function() {
 	(<> (th :class "text-xs-center"
 		:style "padding-right: 0px;")
 	  "Cheque Number")
+    
 	(<> (th :class "text-xs-center"
 		:style "padding-right: 0px;")
 	  "Reference Number")
@@ -629,6 +631,9 @@ $(function() {
 	(<> (th :class "text-xs-center"
 		:style "padding-right: 0px;")
 	  "Recipient")
+		(<> (th :class "text-xs-center"
+				:style "padding-right: 0px;")
+		  "Date Paid")
   (<> (th :class "text-xs-center"
 		      :style "padding-right: 20px;")
 	  (<> 'style
@@ -691,7 +696,8 @@ $(function() {
 	      (recipient (ecm/json:getjso* "cheque.recipient" transaction))
 	      (cheque-number (ecm/json:getjso* "cheque.cheque_number" transaction))
 	      (reference-number (ecm/json:getjso* "cheque.reference_number" transaction))
-	      (schemes-advance-number (ecm/json:getjso* "cheque.schemes_advance_number" transaction)))
+	    (schemes-advance-number (ecm/json:getjso* "cheque.schemes_advance_number" transaction))
+	    (date-paid (getjso "date_paid" transaction)))
     (<> (tr :data-transaction-id _id)
       
       (when claim-id
@@ -744,6 +750,9 @@ $(function() {
 	      (<> :text
 	        (ecm/entity/corpus:corpus-name-as-string
 	         recipient))))
+	  (<> (td :class "text-xs-center")
+	    (when date-paid
+	      (<> :text date-paid)))
       (<> (td :class "text-xs-center")
 	      (<transaction-buttons> _id claim-id)))))
 
@@ -866,12 +875,14 @@ $('[data-ecm-edit-field=approved]').hover(
         },
 
         "columnDefs" : [ { orderable: false, targets: [11] },
-                         { "visible": false, "targets": [0, 11,10,9,8,7]} ],
+                         { "visible": false, "targets": [0, 12, 11,10,9,8,7]} ],
         "drawCallback": function ( settings ) {
             var api = this.api();
-            var cols = api.columns([7,8,9,10,11]).data()
+            var cols = api.columns([7,8,9,10,11,12]).data()
             var col = cols[0];
             var rows = api.rows().nodes()
+
+            console.debug('Drawing table with cheque', cols)
 
             $(col).each( function (n,data) { 
                var payee = cols[0][n] ;
@@ -879,6 +890,10 @@ $('[data-ecm-edit-field=approved]').hover(
                var reference_number = cols[2][n] ;
                var schemes_advance_number = cols[3][n] ;
                var recipient = cols[4][n] ;
+               var date_paid = cols[5][n] ;
+
+            console.debug('date paid', date_paid)
+
              if (payee != "" \|\| cheque_number != ""
                  \|\| reference_number != "" 
                  \|\| schemes_advance_number != "") { 
@@ -893,12 +908,14 @@ $('[data-ecm-edit-field=approved]').hover(
               reference_number = reference_number ? '<tr><th style="border-top:none;">Reference Number</th><td style="border-top:none;">'+reference_number+'</td></tr>' : '' ;
               schemes_advance_number = schemes_advance_number ? '<tr><th style="border-top:none;">Schemes Advance Number</th><td style="border-top:none;">'+schemes_advance_number+'</td></tr>' : '' ;
               recipient = recipient ? '<tr><th style="border-top:none;">Recipient</th><td style="border-top:none;">'+recipient+'</td></tr>' : '' ;
+             date_paid = date_paid ? '<tr><th style="border-top:none;">Date Paid</th><td style="border-top:none;">'+date_paid.replace(/T/, ' ')+'</td></tr>' : '' ;
+
 
 
               $(rows).eq( n ).after(
                   '<tr><td></td><td colspan="5">'
                    + '<div class="cheque"><table class="table table-sm">'
-                   + payee + cheque_number + reference_number + schemes_advance_number + recipient
+                   + payee + cheque_number + reference_number + schemes_advance_number + recipient + date_paid
                    +' </table></div></td>'
                    + '<td colspan "1"></td></tr>' ) ;
 

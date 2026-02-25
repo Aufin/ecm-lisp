@@ -453,106 +453,111 @@ $(document).ready(function() {
 			      (interim-id t)
 			      &allow-other-keys)
   (let* ((claim-id (when claim-id (getjso "claim_id" timecard)))
-	       (_id (getjso "_id" timecard))
-	       (_type (getjso "_type" timecard))
-	       (date (getjso "date" timecard))
-	       (effective-time (getjso "effective_time" timecard))
-	       (expiry-time (getjso "expiry_time" timecard))
-	       (user (getjso "user" timecard))
-	       (billable-hours (getjso "billable_hours" timecard))
-	       (unbillable-hours (getjso "unbillable_hours" timecard))
-	       (mileage (getjso "mileage" timecard))
-	       (disbursement (getjso "disbursement" timecard))
-	       (notes (getjso "notes" timecard))
-	       (attachment (getjso "attachment" timecard))
-	       (interim-id (when interim-id
-		                   (cond ((string-equal _type "timecard-interim")
-			                        _id)
-			                       ((string-equal _type "timecard-continual")
-			                        "continual")
-			                       ((string-equal _type "timecard-total")
-			                        "total")
-			                       (t 
-			                        (or (getjso "interim_id" timecard)
-				                          "continual"))))))
+	     (_id (getjso "_id" timecard))
+	     (_type (getjso "_type" timecard))
+	     (date (getjso "date" timecard))
+	     (effective-time (getjso "effective_time" timecard))
+	     (expiry-time (getjso "expiry_time" timecard))
+	     (user (getjso "user" timecard))
+	     (billable-hours (getjso "billable_hours" timecard))
+	     (unbillable-hours (getjso "unbillable_hours" timecard))
+	     (mileage (getjso "mileage" timecard))
+	     (disbursement (getjso "disbursement" timecard))
+	     (notes (getjso "notes" timecard))
+	     (attachment (getjso "attachment" timecard))
+		 (invoice-id (getjso "invoice_id" timecard))
+		 
+	     (interim-id (when interim-id
+		               (cond ((string-equal _type "timecard-interim")
+			                  _id)
+			                 ((string-equal _type "timecard-continual")
+			                  "continual")
+			                 ((string-equal _type "timecard-total")
+			                  "total")
+			                 (t 
+			                  (or (getjso "interim_id" timecard)
+				                  "continual"))))))
                                         ;    (break "~A : ~A " _type interim-id)
     (<> (tr (cond ((string= _type "claim-timecard")
-		               (list :data-timecard-id _id
-			                   :data-timecard-in-interim interim-id))
-		              ((or (string= _type "timecard-interim")
-		                   (string-equal _type "timecard-continual")
-		                   (string-equal _type "timecard-total"))
-		               ;;		   (break "~A" _type)
-		               (list :data-timecard-interim-id interim-id
-			                   :data-timecard-interim (ecm/json:write-json-to-string
-						                                     timecard)))))
+		           (list :data-timecard-id _id
+			             :data-timecard-in-interim interim-id))
+		          ((or (string= _type "timecard-interim")
+		               (string-equal _type "timecard-continual")
+		               (string-equal _type "timecard-total"))
+		           ;;		   (break "~A" _type)
+		           (list :data-timecard-interim-id interim-id
+			             :data-timecard-interim (ecm/json:write-json-to-string
+						                         timecard)))))
 
       (when claim-id
-	      (<> (td :class "text-xs-center")
-	        (<> :text (getjso "claim_id" timecard))))
 	    (<> (td :class "text-xs-center")
-	      (cond (user
-		           (<> :text (ecm/entity/corpus:corpus-name-as-string
-				                  (getjso "corpus" user)
-				                  :company-name nil
-				                  :province nil)))
-		          ((string= _type "timecard-interim")
-		           (<> (div :class "alert alert-info")
-		             (<> "Interim")
-		             (<> (small :class "text-muted")
-			             (<> :text " from " (ecm/ui/utility:format-timestring
-					                             effective-time)))))
-		          ((string= _type "timecard-continual")
-		           (<> (div :class "alert alert-warning")
-		             (<> "Continual")
-		             (<> (small :class "text-muted")
-			             (<> :text " from " (ecm/ui/utility:format-timestring
-					                             effective-time)))))
-		          ((string= _type "timecard-total")
-		           (<> (div :class "alert bg-inverse text-white")
-		             (<> "Total")))))
+	      (<> :text (getjso "claim_id" timecard))))
+	  (<> (td :class "text-xs-center")
+	    (cond (user
+		       (<> :text (ecm/entity/corpus:corpus-name-as-string
+				          (getjso "corpus" user)
+				          :company-name nil
+				          :province nil)))
+		      ((string= _type "timecard-interim")
+		       (<> (div :class "alert alert-info")
+		         (<> "Interim")
+	
+		         (<> (small :class "text-muted")
+			       (<> :text (ecm/ui/utility:format-timestring
+							  effective-time :format +timecard-date-format+))
+				   (when invoice-id 
+					 (<> (button :type "button" :class "btn btn-outline-secondary btn-sm fa fa-book" :data-toggle "tooltip" :data-placement "top" :title (format nil "View Invoice #~A" invoice-id)))))))
+		       ((string= _type "timecard-continual")
+				(<> (div :class "alert alert-warning")
+		          (<> "Continual")
+		          (<> (small :class "text-muted")
+					(<> :text " from " (ecm/ui/utility:format-timestring
+					                   effective-time)))))
+		      ((string= _type "timecard-total")
+		       (<> (div :class "alert bg-inverse text-white")
+		         (<> "Total")))))
       
-	    (<> (td :class "text-xs-center")
-	      (when date (<> :text            ;date
-			               (ecm/ui/utility:format-timestring
+	  (<> (td :class "text-xs-center")
+	    (when date (<> :text            ;date
+			         (ecm/ui/utility:format-timestring
                       date :format +timecard-date-format+)))
-	      (when expiry-time (<> :text (ecm/ui/utility:format-timestring expiry-time))))
+	    (when expiry-time (<> :text (ecm/ui/utility:format-timestring expiry-time))))
        
 
-	    (<> (td :class "text-xs-center")
-	      (<> :text billable-hours))
+	  (<> (td :class "text-xs-center")
+	    (<> :text billable-hours))
 
-	    (<> (td :class "text-xs-center")
-	      (<> :text unbillable-hours))
+	  (<> (td :class "text-xs-center")
+	    (<> :text unbillable-hours))
 
-	    (<> (td :class "text-xs-center")
-	      (<> :text mileage))
+	  (<> (td :class "text-xs-center")
+	    (<> :text mileage))
       
-	    (<> (td :class "text-xs-center"
-		          :style "padding-left:0.5rem;padding-right:0.5rem")
-	      (<> :text "$" disbursement))
+	  (<> (td :class "text-xs-center"
+		      :style "padding-left:0.5rem;padding-right:0.5rem")
+	    (<> :text "$" disbursement))
 
-	    (<> (td :class "text-xs-center")
-	      (when notes (<> :text notes)))
+	  (<> (td :class "text-xs-center")
+	    (when notes (<> :text notes)))
 
-	    (<> (td :class "text-xs-center")
-	      (when attachment
-		      (ecm/ui/attachment:<link-to-attachment> attachment)))
+	  (<> (td :class "text-xs-center")
+	    (when attachment
+		  (ecm/ui/attachment:<link-to-attachment> attachment)))
 
-	    (<> (td :class "text-xs-center"
-		          :data-interim-id interim-id)
-	      (cond (interim-id
-		           (<> :text interim-id))))
+	  (<> (td :class "text-xs-center"
+		      :data-interim-id interim-id)
+	    (cond (interim-id
+		       (<> :text interim-id))))
       
-	    (when buttons
-		    (<> (td :class "text-xs-center")
-		      (cond ((string= _type "claim-timecard")
-			           (<timecard-buttons> _id claim-id))
-			          ((string= _type "timecard-continual")
-			           (<continual-buttons> claim-id))
-			          ((string= _type "timecard-interim")
-			           (<interim-buttons> _id claim-id))
-			          (t #+(or)(<> :text _type))))))))
+	  (when buttons
+		(<> (td :class "text-xs-center")
+		  (cond ((string= _type "claim-timecard")
+			     (<timecard-buttons> _id claim-id))
+			    ((string= _type "timecard-continual")
+			     (<continual-buttons> claim-id))
+			    ((string= _type "timecard-interim")
+			     (<interim-buttons> _id claim-id))
+			    (t #+(or)(<> :text _type))))))))
 				 
 (defun <timecard-buttons> (_id claim-id)
   (<> '(html5:div :class "center-block timecard-buttons")

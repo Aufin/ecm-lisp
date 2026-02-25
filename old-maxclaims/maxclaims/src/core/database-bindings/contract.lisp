@@ -1,5 +1,13 @@
 (in-package :maxclaims)
 
+(defclass settlement-type ()
+  ((name :primary-key t))
+  (:metaclass described-db-access-class))
+
+(defun settlement-types ()
+  (select-objects 'settlement-type))
+
+
 (defclass contract ()
   ((contract-id :primary-key t)
    contract-number 
@@ -9,6 +17,7 @@
    syndicate-id
    london-broker-id
    loss-fund
+   settlement-type
    (agency :column agency-id 
 	   :references (person person-id))
    (syndicate :column syndicate-id 
@@ -20,6 +29,8 @@
 	  :on contract-id)
    insurance-company-id)
   (:metaclass described-db-access-class))
+
+
 
 (defclass contract-authority ()
   ((contract-id :primary-key t)

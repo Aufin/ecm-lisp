@@ -258,6 +258,7 @@
 		#:date
 		#:loss-fund
 		#:contract
+		#:settlement-type
 		#:contract-number
 		#:contract.contract-id
 		#:contract-authority

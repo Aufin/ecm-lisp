@@ -1079,10 +1079,13 @@ dropdown-menu" aria-labelledby="dropdownMenuButton">
    <a class="dropdown-item" href="#"
         onclick="cloneClaim.show()">Clone with #| claim-id '| as master</a>
   |)
-             (when leader
-               (<> '(h5 :class "dropdown-header") "Master")
-               (<> (html5:a :href (format nil "/ecm/claim/~A" leader) :class "dropdown-item")
-                 (<> :text "#" leader)))
+
+			 (cond
+			   (leader
+				(<> '(h5 :class "dropdown-header") "Master")
+				(<> (html5:a :href (format nil "/ecm/claim/~A" leader) :class "dropdown-item")
+                  (<> :text "#" leader))))
+
 
              (when peers (<> '(h5 :class "dropdown-header") "Peers")
                    (group-members peers))
@@ -1099,9 +1102,20 @@ dropdown-menu" aria-labelledby="dropdownMenuButton">
 
 |)
 
-          (<claim-heading> claim-number insured status claim)
-  (when leader (<> 'h5 "Master: " (<> (html5:a :href (format nil "/ecm/claim/~A" leader))
-                                              (<> :text "#" leader))))
+			 (<claim-heading> claim-number insured status claim)
+			 
+			 (cond (leader
+					(<> 'h5 "Master: "
+					  (<> (html5:a :href (format nil "/ecm/claim/~A" leader))
+                        (<> :text "#" leader))))
+				   (followers
+					(<> 'h5 "Followers: "
+					(dolist (f followers)
+					  (<> (html5:a :href (format nil "/ecm/claim/~A" (st-json:getjso "claim_id" f)))
+							  
+						(<> :text "#"
+						  (st-json:getjso "claim_id" f) " "
+						  (st-json:getjso "percent" f) "% "))))))
          ))
         ;; *** Body
         (<> (div :id "claimInfo"

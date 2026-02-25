@@ -3,37 +3,39 @@
 
 (symbol-macrolet 
     ((|contract edit create| 
-      '((contract-number :label t
-	 :active t
-	 :required t)
-	(effective-date 
-	 :label t
-	 :active t
-	 :type simple-date:date
-	 :required t)
-	(expiry-date 
-	 :label t
-	 :active t
-	 :type simple-date:date
-	 :required t)
-	(agency :label t
-	 :active t
-	 :select-objects (:search maxclaims::string-search-person
-			  :existing)
-	 :type person)
-	(syndicate :label t
-	 :select-objects (:search maxclaims::string-search-person
-			  :existing)
-	 :type person
-	 :active t)
-	(london-broker :label t
-	 :select-objects (:search maxclaims::string-search-person
-			  :existing)
-	 :type person
-				   :active t)
-		(loss-fund :label "Loss Fund Limit"
-				   :active t)
-	)))
+       '((contract-number :label t
+						  :active t
+						  :required t)
+		 (effective-date 
+		  :label t
+		  :active t
+		  :type simple-date:date
+		  :required t)
+		 (expiry-date 
+		  :label t
+		  :active t
+		  :type simple-date:date
+		  :required t)
+		 (agency :label t
+				 :active t
+				 :select-objects (:search maxclaims::string-search-person
+								  :existing)
+				 :type person)
+		 (syndicate :label t
+					:select-objects (:search maxclaims::string-search-person
+									 :existing)
+					:type person
+					:active t)
+		 (london-broker :label t
+						:select-objects (:search maxclaims::string-search-person
+										 :existing)
+						:type person
+						:active t)
+		 (loss-fund :label "Loss Fund Limit"
+					:active t)
+		 (settlement-type
+		  :label "Settlement Type"
+		  :select-objects (maxclaims::settlement-types)))))
   
   (macrolet 
       ((def ()

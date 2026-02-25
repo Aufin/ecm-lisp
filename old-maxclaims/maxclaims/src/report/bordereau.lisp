@@ -1135,14 +1135,9 @@ $$;"
      nil
      text)
     ("Date Claim Paid"
-     (:raw "(SELECT paid.date
-       FROM (SELECT claim_outstanding_reserve(ct.transaction_heading, ct.claim_id)
-             AS outr, ct.transaction_date AS date
-             FROM claim_transaction AS ct
-             WHERE claim_transaction_is_indemnity(ct)
-             AND int4range(3,5) @> ct.transaction_type_id
-             AND ct.claim_id = claim.claim_id ORDER BY transaction_date DESC)
-       AS paid WHERE outr = 0 ORDER BY date DESC limit 1)")
+     (:raw "(SELECT min(date_paid) FROM claim_transaction ct
+             WHERE ct.claim_id = claim.claim_id
+		     AND claim_transaction_is_indemnity(ct))")
      nil
      nil
      date)
@@ -1420,11 +1415,8 @@ $$;"
     ("Date Coverage Confirmed"
      (:raw "'???'"))
     ("Date Claim Amount Agreed"
-     (:type (:raw "(SELECT transaction_date FROM claim_transaction AS ct
-             WHERE claim_transaction_is_indemnity(ct)
-             AND int4range(3,5) @> ct.transaction_type_id
-             AND ct.claim_id = claim.claim_id
-             ORDER BY ct.transaction_date LIMIT 1)") :date)
+     (:type (:raw "claim_date_amount_agreed(claim.claim_id)")
+	       :date)
      nil nil date)
     ("Date Claim Opened"
      (:type claim.open_date :date) nil nil date)
